@@ -1,0 +1,6 @@
+{
+  "name": "GenLayer Smart NFT Registry",
+  "description": "پلتفرم ثبت و ارزیابی مالکیت معنوی (IP Patent) به صورت NFTهای هوشمند بر روی شبکه جن‌لایر با اجماع هوش مصنوعی و وب",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
