@@ -75,7 +75,7 @@ const initialPatents: PatentNFT[] = [
     id: "GL-NFT-001",
     title: "Quantum-Resistant Decentralized Multi-Party Computation Identity Wallet",
     creator: "Dr. Alice Vance",
-    category: "Cryptography & Identity",
+    category: "Cryptography & Network Security",
     abstract: "A novel protocol combining lattices with decentralized multi-party computation (MPC) to establish a keyless, post-quantum secure cryptographic wallet. Shards of the private keys are mathematically proved to never exist on any single device, using multi-source zero-knowledge proofs.",
     claims: "1. A method for post-quantum secure distributed threshold signature generation.\n2. Verification of state transitions using lattice-based zero-knowledge proofs over public ledgers.\n3. Dynamic shard reshuffling via an interactive verifiable secret sharing scheme.",
     supportingUrl: "https://arxiv.org/abs/crypto-mpc-identity-quantum",
@@ -126,7 +126,7 @@ const initialPatents: PatentNFT[] = [
     id: "GL-NFT-002",
     title: "Self-Healing Bio-Polymer Solar Film coating",
     creator: "Julian Thorne",
-    category: "Materials Science & CleanTech",
+    category: "CleanTech & Renewable Energy",
     abstract: "A sprayable polymer coating containing vascularized micro-capsules filled with conductive organic solar polymers. When micro-fractures occur due to physical damage or weathering, the capsules rupture, polymerizing and restoring solar energy transmission within seconds.",
     claims: "1. A dynamic self-healing photovoltaic polymer containing dispersed liquid conductive monomer complexes.\n2. A micro-vascular matrix embedded in synthetic elastomer sheets configured to heal conductive micro-lines.",
     supportingUrl: "https://nature.org/materials-solar-selfhealing-coating",
@@ -278,7 +278,7 @@ For each validator, you must:
 - Analyze if similar inventions exist on the web (use your search grounding to look up recent, real technologies).
 - Give a decision ("APPROVED" or "REJECTED"). Note: To be approved, an invention must be truly novel, non-obvious, and have utility.
 - Assign a score (1 to 100) for: Novelty, Inventive Step (Non-obviousness), and Industrial Applicability (Utility).
-- Write a 2-3 sentence rationale in Persian or English (technical Persian mixed with English terms is preferred, since the user asked in Persian, but the registry itself is international. Keep it elegant, authentic, and detailed).
+- Write a 2-3 sentence rationale in English. Keep it elegant, technical, authentic, and detailed.
 - Cite real or highly realistic prior art papers, websites, or patents found during search grounding.
 
 Then calculate the CONSENSUS outcome:
@@ -307,7 +307,7 @@ Return the response STRICTLY as a single JSON object. Do not include any markdow
       "noveltyScore": number,
       "inventiveScore": number,
       "utilityScore": number,
-      "rationale": "string in Persian or English",
+      "rationale": "string in English",
       "priorArtReferences": ["string"]
     },
     ... (repeat for Legal Counsel AI and Industry Expert AI)
@@ -415,7 +415,7 @@ Decide on a consensus resolution:
 Return a JSON object with this exact schema:
 {
   "newStatus": "APPROVED" | "DISPUTED" | "REVOKED",
-  "resolution": "A 3-4 sentence detailed summary in Persian or English explaining the validators' joint consensus on why the patent was upheld, disputed, or revoked, referencing the challenger's links/arguments."
+  "resolution": "A 3-4 sentence detailed summary in English explaining the validators' joint consensus on why the patent was upheld, disputed, or revoked, referencing the challenger's links/arguments."
 }
 `;
 

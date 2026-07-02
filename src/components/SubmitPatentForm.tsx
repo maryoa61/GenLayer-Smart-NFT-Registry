@@ -12,9 +12,9 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
   const [formData, setFormData] = useState({
     title: '',
     creator: '',
-    category: 'هوش مصنوعی و داده‌های کلان',
+    category: 'Artificial Intelligence & Big Data',
     abstract: '',
-    claims: '1. روشی برای ...\n2. سامانه‌ای متشکل از ...\n3. فرآیند پویای انتقال داده بر مبنای ...',
+    claims: '1. A method for ...\n2. A system comprising ...\n3. A dynamic data transfer process based on ...',
     supportingUrl: ''
   });
 
@@ -22,27 +22,27 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
   const [loadingStep, setLoadingStep] = useState(0);
 
   const categories = [
-    'هوش مصنوعی و داده‌های کلان',
-    'کریپتوگرافی و امنیت شبکه',
-    'زیست‌فناوری و مهندسی پزشکی',
-    'فناوری‌های پاک و انرژی نو',
-    'اینترنت اشیاء (IoT) و سخت‌افزار',
-    'سایر صنایع پیشرفته'
+    'Artificial Intelligence & Big Data',
+    'Cryptography & Network Security',
+    'Biotechnology & Medical Engineering',
+    'Clean Technologies & Green Energy',
+    'Internet of Things (IoT) & Hardware',
+    'Other Advanced Industries'
   ];
 
   const loadingSteps = [
-    'در حال ارسال داده‌های اختراع به شبکه آزمایشی جن‌لایر...',
-    'در حال راه‌اندازی ۳ گره ولیدیتور مستقل (Scholar, Legal, Industry Expert)...',
-    'در حال اجرای وب‌سرچ هوشمند (gl.nondet.web) برای بررسی پیشینه اختراع در گوگل و آرکایو...',
-    'در حال بررسی ادعاها و نوآوری فنی توسط مدل‌های زبانی (gl.nondet.exec_prompt)...',
-    'در حال محاسبه هم‌ارزی آرا و اجماع نهایی داوران (gl.eq_principle)...',
-    'موفقیت‌آمیز! در حال تولید گرافیک مدرن و صدور NFT هوشمند در دفترکل جن‌لایر...'
+    'Submitting patent data to GenLayer Testnet...',
+    'Deploying 3 independent AI Validator nodes (Scholar, Legal, Industry Expert)...',
+    'Running smart web search (gl.nondet.web) to crawl academic papers, Google, and arXiv for prior art...',
+    'Executing multi-agent LLM analysis on patent claims and novelty (gl.nondet.exec_prompt)...',
+    'Computing vote equivalence and consensus results across nodes (gl.eq_principle)...',
+    'Success! Generating interactive graphics and minting on-chain Smart IP-NFT on GenLayer ledger...'
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.creator || !formData.abstract || !formData.claims) {
-      alert('لطفاً تمامی فیلدهای اجباری را تکمیل فرمایید.');
+      alert('Please complete all required fields.');
       return;
     }
 
@@ -96,8 +96,8 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-serif italic text-white tracking-tight">ثبت و ارزیابی ایده جدید (IP NFT)</h2>
-                  <p className="text-xs text-slate-400 mt-1">با استفاده از اجماع غیرقطعی و داوری هوش مصنوعی شبکه جن‌لایر</p>
+                  <h2 className="text-xl font-serif italic text-white tracking-tight">Register & Evaluate New Idea (IP NFT)</h2>
+                  <p className="text-xs text-slate-400 mt-1">Powered by GenLayer non-deterministic consensus and multi-agent AI validators</p>
                 </div>
               </div>
               <button
@@ -105,24 +105,24 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
                 onClick={onCancel}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-sm text-xs font-bold uppercase transition-colors cursor-pointer"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> بازگشت
+                <ArrowLeft className="w-3.5 h-3.5" /> Back
               </button>
             </div>
 
             {/* Form Fields */}
-            <form onSubmit={handleSubmit} className="space-y-5 text-right" dir="rtl">
+            <form onSubmit={handleSubmit} className="space-y-5 text-left" dir="ltr">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Title */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    عنوان علمی یا اختراع <span className="text-red-500">*</span>
+                    Scientific Title / Invention Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="مثال: باتری لیتیوم-سولفور با کاتد نانوساختار متخلخل"
+                    placeholder="e.g. Lithium-Sulfur Battery with Porous Nanostructured Cathode"
                     className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-sm text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all font-sans"
                     id="input-title"
                   />
@@ -131,14 +131,14 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
                 {/* Creator */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
-                    پدیدآورنده / مخترع <span className="text-red-500">*</span>
+                    Creator / Inventor <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={formData.creator}
                     onChange={(e) => setFormData({ ...formData, creator: e.target.value })}
-                    placeholder="نام و نام خانوادگی مخترع یا شرکت"
+                    placeholder="Full name of inventor or organization"
                     className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-sm text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all font-sans"
                     id="input-creator"
                   />
@@ -147,7 +147,7 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
 
               {/* Category */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400">دسته‌بندی فناوری</label>
+                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400">Technology Category</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -163,15 +163,15 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
               {/* Abstract */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  خلاصه فنی ایده (Abstract) <span className="text-red-500">*</span>
-                  <HelpCircle className="w-3.5 h-3.5 text-slate-500 hover:text-indigo-400 cursor-help" title="این متن توسط گره‌های هوشمند جن‌لایر تحلیل می‌شود" />
+                  Technical Abstract <span className="text-red-500">*</span>
+                  <HelpCircle className="w-3.5 h-3.5 text-slate-500 hover:text-indigo-400 cursor-help" title="This text is analyzed by GenLayer AI nodes for novelty check" />
                 </label>
                 <textarea
                   required
                   rows={4}
                   value={formData.abstract}
                   onChange={(e) => setFormData({ ...formData, abstract: e.target.value })}
-                  placeholder="توصیف فنی کاملی از نوآوری خود، روش کارکرد و تفاوت آن با راه‌حل‌های موجود را بنویسید..."
+                  placeholder="Provide a comprehensive technical description of your invention, how it functions, and why it is superior to existing solutions..."
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-sm text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all font-sans leading-relaxed"
                   id="input-abstract"
                 />
@@ -180,14 +180,14 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
               {/* Claims */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
-                  ادعاهای ثبت اختراع (Patent Claims) <span className="text-red-500">*</span>
+                  Patent Claims <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   required
                   rows={4}
                   value={formData.claims}
                   onChange={(e) => setFormData({ ...formData, claims: e.target.value })}
-                  placeholder="ادعاهای مستقل و وابسته اختراع خود را به صورت گام‌به‌گام تفکیک کنید..."
+                  placeholder="Detail the independent and dependent claims of your invention step-by-step..."
                   className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-sm text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-all font-sans leading-relaxed"
                   id="input-claims"
                 />
@@ -195,7 +195,7 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
 
               {/* Supporting URL */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400">لینک مستندات تکمیلی / مقاله علمی (اختیاری)</label>
+                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400">Supporting Documentation / Scientific Paper Link (Optional)</label>
                 <input
                   type="url"
                   value={formData.supportingUrl}
@@ -214,14 +214,14 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
                   onClick={onCancel}
                   className="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-sm text-xs font-bold uppercase transition-colors cursor-pointer"
                 >
-                  انصراف
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="bg-white text-black px-6 py-2.5 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-colors cursor-pointer"
                   id="btn-submit"
                 >
-                  ارسال به شبکه جن‌لایر (AI Consensus)
+                  Submit to GenLayer Network (AI Consensus)
                 </button>
               </div>
             </form>
@@ -245,7 +245,7 @@ export default function SubmitPatentForm({ onSubmit, onCancel }: SubmitPatentFor
             <div className="space-y-2 max-w-lg">
               <h3 className="text-lg font-serif italic text-white flex items-center justify-center gap-2">
                 <Network className="w-5 h-5 text-indigo-400" />
-                در حال اجرای هوشمند قرارداد جن‌لایر
+                Executing GenLayer Intelligent Contract
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed min-h-[3rem] px-4 font-sans italic">
                 {loadingSteps[loadingStep]}

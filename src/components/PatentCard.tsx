@@ -47,7 +47,7 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
     }
   };
 
-  const formattedDate = new Date(patent.mintedAt).toLocaleDateString('fa-IR', {
+  const formattedDate = new Date(patent.mintedAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
@@ -73,7 +73,7 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
               {patent.id}
             </span>
             <span className={`text-[10px] px-2.5 py-1 rounded-sm border font-mono tracking-widest uppercase ${getStatusColor(patent.status)}`}>
-              {patent.status === 'APPROVED' ? 'تایید شده / ON-CHAIN' : patent.status === 'DISPUTED' ? 'مورد اختلاف' : patent.status === 'REVOKED' ? 'ابطال شده' : patent.status}
+              {patent.status === 'APPROVED' ? 'APPROVED / ON-CHAIN' : patent.status === 'DISPUTED' ? 'DISPUTED' : patent.status === 'REVOKED' ? 'REVOKED' : patent.status}
             </span>
           </div>
           {getTierBadge(patent.tier)}
@@ -111,7 +111,7 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
             id={`btn-view-logs-${patent.id}`}
           >
             <Eye className="w-3.5 h-3.5 text-indigo-400" />
-            گزارش اجماع هوش مصنوعی
+            AI Consensus Report
           </button>
 
           <div className="flex items-center gap-2">
@@ -122,7 +122,7 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
                 id={`btn-challenge-${patent.id}`}
               >
                 <Flame className="w-3.5 h-3.5" />
-                چالش اصالت
+                Challenge Authenticity
               </button>
             )}
 
@@ -152,7 +152,7 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
               <div>
                 <h4 className="flex items-center gap-2 text-xs font-bold text-white/40 tracking-wider uppercase mb-2">
                   <FileText className="w-3.5 h-3.5 text-indigo-400" />
-                  ادعاهای ثبت شده (Patent Claims)
+                  Patent Claims
                 </h4>
                 <pre className="font-sans whitespace-pre-wrap text-white/80 leading-relaxed bg-black/30 p-4 rounded-xl border border-white/5 font-normal text-xs">
                   {patent.claims}
@@ -164,7 +164,7 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
                 <div>
                   <h4 className="flex items-center gap-2 text-xs font-bold text-white/40 tracking-wider uppercase mb-2">
                     <Globe className="w-3.5 h-3.5 text-emerald-400" />
-                    لینک مستندات / مراجع علمی
+                    Supporting Documentation / Scientific References
                   </h4>
                   <a
                     href={patent.supportingUrl}
@@ -180,15 +180,15 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
               {/* Consensus Metadata */}
               <div className="grid grid-cols-3 gap-3 pt-2">
                 <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                  <span className="block text-[10px] text-white/40 font-bold uppercase mb-0.5">میانگین امتیاز نوآوری</span>
-                  <span className="text-base font-bold text-indigo-400">{patent.averageScore}٪</span>
+                  <span className="block text-[10px] text-white/40 font-bold uppercase mb-0.5">Average Novelty Score</span>
+                  <span className="text-base font-bold text-indigo-400">{patent.averageScore}%</span>
                 </div>
                 <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                  <span className="block text-[10px] text-white/40 font-bold uppercase mb-0.5">تعداد گره‌های داور</span>
+                  <span className="block text-[10px] text-white/40 font-bold uppercase mb-0.5">Validator Nodes Count</span>
                   <span className="text-base font-bold text-emerald-400">{patent.validators.length}</span>
                 </div>
                 <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-center">
-                  <span className="block text-[10px] text-white/40 font-bold uppercase mb-0.5">پروتکل اجماع</span>
+                  <span className="block text-[10px] text-white/40 font-bold uppercase mb-0.5">Consensus Protocol</span>
                   <span className="text-[10px] font-mono font-bold text-purple-400">gl.eq_principle</span>
                 </div>
               </div>
@@ -198,27 +198,27 @@ export default function PatentCard({ patent, onViewConsensus, onChallenge }: Pat
                 <div className="pt-2 border-t border-white/5 space-y-3">
                   <h4 className="flex items-center gap-2 text-xs font-bold text-rose-400 tracking-wider uppercase">
                     <AlertCircle className="w-3.5 h-3.5" />
-                    تاریخچه چالش‌ها و دعاوی اصالت ({patent.challenges.length})
+                    Challenges & Authenticity History ({patent.challenges.length})
                   </h4>
                   <div className="space-y-3">
                     {patent.challenges.map((c, idx) => (
                       <div key={idx} className="bg-rose-950/20 border border-rose-900/30 rounded-xl p-4 text-xs">
                         <div className="flex justify-between text-[10px] text-white/50 mb-1.5">
-                          <span>توسط: <strong className="text-white">{c.challenger}</strong></span>
-                          <span>{new Date(c.timestamp).toLocaleDateString('fa-IR')}</span>
+                          <span>By: <strong className="text-white">{c.challenger}</strong></span>
+                          <span>{new Date(c.timestamp).toLocaleDateString('en-US')}</span>
                         </div>
                         <p className="text-white/80 mb-2 leading-relaxed">
-                          <strong>شرح ادعای کپی‌رایت:</strong> {c.challengerExplanation}
+                          <strong>Challenger's Explanation:</strong> {c.challengerExplanation}
                         </p>
                         {c.challengeUrl && (
                           <div className="mb-2">
-                            <span className="text-white/40">سند کپی‌برداری: </span>
+                            <span className="text-white/40">Prior Art Document: </span>
                             <a href={c.challengeUrl} target="_blank" rel="noreferrer" className="text-rose-400 underline">{c.challengeUrl}</a>
                           </div>
                         )}
                         {c.resolution && (
                           <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-white/90">
-                            <strong className="text-emerald-400 block mb-1">نتیجه بازبینی داوران هوشمند جن‌لایر:</strong>
+                            <strong className="text-emerald-400 block mb-1">GenLayer AI Validators Resolution:</strong>
                             <p className="leading-relaxed">{c.resolution}</p>
                           </div>
                         )}

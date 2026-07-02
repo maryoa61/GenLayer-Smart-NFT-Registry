@@ -205,17 +205,17 @@ class IntelligentPatentNFT:
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#0a0a0a]">
           <div>
-            <span className="text-[10px] tracking-widest text-indigo-400 font-mono uppercase block mb-1">گزارش ممیزی و اجماع بلاکچین / AI AUDIT LOG</span>
+            <span className="text-[10px] tracking-widest text-indigo-400 font-mono uppercase block mb-1">AI AUDIT LOG & BLOCKCHAIN CONSENSUS REPORT</span>
             <h2 className="text-lg font-serif italic text-white flex items-center gap-2">
               <Network className="w-5 h-5 text-indigo-500" />
-              کالکشن هوشمند جن‌لایر: {patent.id}
+              GenLayer Smart Collection: {patent.id}
             </h2>
           </div>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white px-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm text-xs font-bold uppercase transition-colors cursor-pointer"
           >
-            بستن
+            Close
           </button>
         </div>
 
@@ -230,7 +230,7 @@ class IntelligentPatentNFT:
             }`}
           >
             <Cpu className="w-4 h-4" />
-            وضعیت گره‌های داور (AI Nodes)
+            AI Validator Nodes Status
           </button>
           <button
             onClick={() => setActiveTab('code')}
@@ -241,7 +241,7 @@ class IntelligentPatentNFT:
             }`}
           >
             <Code className="w-4 h-4" />
-            سورس‌کد قرارداد جن‌لایر (Python)
+            GenLayer Smart Contract (Python)
           </button>
         </div>
 
@@ -310,22 +310,22 @@ class IntelligentPatentNFT:
                       {/* Metric Scores */}
                       <div className="grid grid-cols-3 gap-2 text-center bg-black/40 p-2.5 rounded-sm border border-white/5 font-mono">
                         <div>
-                          <span className="block text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">اصالت</span>
-                          <span className="text-xs font-bold text-indigo-400">{validator.noveltyScore}٪</span>
+                          <span className="block text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">Novelty</span>
+                          <span className="text-xs font-bold text-indigo-400">{validator.noveltyScore}%</span>
                         </div>
                         <div>
-                          <span className="block text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">گام نوآوری</span>
-                          <span className="text-xs font-bold text-purple-400">{validator.inventiveScore}٪</span>
+                          <span className="block text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">Inventive Step</span>
+                          <span className="text-xs font-bold text-purple-400">{validator.inventiveScore}%</span>
                         </div>
                         <div>
-                          <span className="block text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">کاربرد</span>
-                          <span className="text-xs font-bold text-emerald-400">{validator.utilityScore}٪</span>
+                          <span className="block text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">Utility</span>
+                          <span className="text-xs font-bold text-emerald-400">{validator.utilityScore}%</span>
                         </div>
                       </div>
 
                       {/* Rationale Text */}
                       <div className="flex-1">
-                        <span className="block text-[9px] text-slate-500 font-mono uppercase tracking-wider mb-1.5">استدلال و بازبینی گره:</span>
+                        <span className="block text-[9px] text-slate-500 font-mono uppercase tracking-wider mb-1.5">Validator Rationale:</span>
                         <p className="text-xs text-slate-300 italic leading-relaxed bg-black/30 p-3 rounded-sm border border-white/5">
                           "{validator.rationale}"
                         </p>
@@ -336,7 +336,7 @@ class IntelligentPatentNFT:
                         <div className="pt-2 border-t border-white/5">
                           <span className="flex items-center gap-1.5 text-[9px] text-slate-500 font-mono uppercase tracking-wider mb-1.5">
                             <Search className="w-3.5 h-3.5 text-indigo-400" />
-                            مستندات کشف شده در وب (Prior Art):
+                            Web-Discovered Evidence (Prior Art):
                           </span>
                           <ul className="space-y-1">
                             {validator.priorArtReferences.map((ref, rIdx) => (
@@ -359,10 +359,10 @@ class IntelligentPatentNFT:
               {/* Educational Sidebar - 4 cols */}
               <div className="lg:col-span-4 space-y-4">
                 {/* Actions Panel */}
-                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-4 shadow-lg text-right">
-                  <h4 className="font-serif italic text-white text-sm border-b border-white/5 pb-2">جعبه‌ابزار توسعه‌دهندگان (SDK Kit)</h4>
+                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-4 shadow-lg text-left">
+                  <h4 className="font-serif italic text-white text-sm border-b border-white/5 pb-2">Developer Toolkit (SDK Kit)</h4>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    این کد یک پیاده‌سازی مرجع و کاملاً قابل استفاده مجدد از قراردادهای هوشمند شبکه جن‌لایر برای ثبت دارایی‌های پویا (Dynamic IP NFTs) است.
+                    This code is a reference and fully reusable implementation of GenLayer smart contracts for registering dynamic on-chain IP NFTs.
                   </p>
                   
                   <div className="flex flex-col gap-2">
@@ -378,12 +378,12 @@ class IntelligentPatentNFT:
                       {copied ? (
                         <>
                           <Check className="w-4 h-4 text-emerald-300" />
-                          <span>کپی شد! (Copied)</span>
+                          <span>Copied!</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-4 h-4" />
-                          <span>کپی سورس‌کد پایتون</span>
+                          <span>Copy Python Source</span>
                         </>
                       )}
                     </button>
@@ -404,37 +404,37 @@ class IntelligentPatentNFT:
                       className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-slate-200 rounded-sm text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
                       <Download className="w-4 h-4 text-indigo-400" />
-                      <span>دانلود فایل intelligent_patent.py</span>
+                      <span>Download intelligent_patent.py</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Core Architecture Explanations */}
-                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-4 text-right">
-                  <h4 className="font-serif italic text-white text-sm border-b border-white/5 pb-2 flex items-center gap-2 justify-end">
+                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-4 text-left">
+                  <h4 className="font-serif italic text-white text-sm border-b border-white/5 pb-2 flex items-center gap-2 justify-start">
                     <ShieldAlert className="w-4 h-4 text-indigo-400" />
-                    اصول معماری جن‌لایر (GenLayer Core)
+                    GenLayer Core Architecture
                   </h4>
                   
                   <div className="space-y-3.5 text-xs">
                     <div className="space-y-1">
-                      <span className="font-bold text-indigo-300 font-mono block">۱. طراحی وضعیت واضح (State Design):</span>
+                      <span className="font-bold text-indigo-300 font-mono block">1. Secure State Design:</span>
                       <p className="text-slate-400 leading-relaxed">
-                        استفاده از کلاس‌های نگهدارنده داده امن مانند <code className="bg-black/40 border border-white/10 px-1 py-0.5 rounded text-pink-400 font-mono text-[10px]">gl.storage.dict()</code> و <code className="bg-black/40 border border-white/10 px-1 py-0.5 rounded text-pink-400 font-mono text-[10px]">gl.storage.int()</code> که یکپارچگی حالت و تغییرناپذیری داده را در سراسر زنجیره بلوکی تضمین می‌کند.
+                        Usage of secure on-chain state variables like <code className="bg-black/40 border border-white/10 px-1 py-0.5 rounded text-pink-400 font-mono text-[10px]">gl.storage.dict()</code> and <code className="bg-black/40 border border-white/10 px-1 py-0.5 rounded text-pink-400 font-mono text-[10px]">gl.storage.int()</code> to guarantee decentralized state integrity.
                       </p>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="font-bold text-indigo-300 font-mono block">۲. اوراکل‌های وب غیرقطعی:</span>
+                      <span className="font-bold text-indigo-300 font-mono block">2. Non-Deterministic Web Oracles:</span>
                       <p className="text-slate-400 leading-relaxed">
-                        استفاده از تابع <code className="bg-black/40 border border-white/10 px-1 py-0.5 rounded text-indigo-400 font-mono text-[10px]">gl.nondet.web.search()</code> جهت استعلام و کاوش بلادرنگ اینترنت در مراجع معتبر علمی و ادارات ثبت اختراع قبل از هرگونه تخصیص حالت.
+                        Invoking the <code className="bg-black/40 border border-white/10 px-1 py-0.5 rounded text-indigo-400 font-mono text-[10px]">gl.nondet.web.search()</code> method enables real-time, parallel web lookups across scientific portals and official patent directories.
                       </p>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="font-bold text-indigo-300 font-mono block">۳. اصل هم‌ارزی (Equivalence Principle):</span>
+                      <span className="font-bold text-indigo-300 font-mono block">3. The Equivalence Principle:</span>
                       <p className="text-slate-400 leading-relaxed">
-                        شبکه جن‌لایر اجرای تابع غیرقطعی ارزیابی را به صورت موازی به چندین ولیدیتور مستقل می‌سپارد. تا زمانی که تصمیم داورها بر روی نتایج نهایی به توافق (اجماع) نرسد، تراکنش نهایی روی شبکه مستقر نخواهد شد.
+                        The GenLayer protocol assigns non-deterministic functions to multiple independent validators simultaneously. The execution is only committed once validator evaluations reach consensus.
                       </p>
                     </div>
                   </div>
@@ -442,16 +442,16 @@ class IntelligentPatentNFT:
               </div>
 
               {/* Code Viewer Container - 8 cols */}
-              <div className="lg:col-span-8 space-y-4 text-right">
+              <div className="lg:col-span-8 space-y-4 text-left">
                 <div className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-indigo-500/10 rounded-sm border border-indigo-500/20">
                       <Code className="w-5 h-5 text-indigo-400" />
                     </div>
                     <div>
-                      <h3 className="font-serif italic text-white text-sm">پیاده‌سازی مرجع در شبکه آزمایشی جن‌لایر</h3>
+                      <h3 className="font-serif italic text-white text-sm">GenLayer Testnet Reference Implementation</h3>
                       <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                        این سورس‌کد پایتون قرارداد هوشمند بر روی شبکه جن‌لایر مستقر شده است و چرخه‌عمر ثبت، ارزیابی، و به چالش کشیدن سند را مدیریت می‌کند.
+                        This Python smart contract is deployed on GenLayer, managing the registration, validation, and dispute lifecycle of intellectual property certificates.
                       </p>
                     </div>
                   </div>
