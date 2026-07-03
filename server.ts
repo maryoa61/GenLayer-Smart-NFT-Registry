@@ -1,8 +1,8 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI, Type } from '@google/genai';
 import dotenv from 'dotenv';
+import { NFT_Record, Listing, AuditHistoryEntry, ChallengeHistoryEntry, ValidatorReport } from './src/types';
 
 dotenv.config();
 
@@ -11,486 +11,841 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Initialize Gemini
-let ai: GoogleGenAI | null = null;
-try {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (apiKey) {
-    ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    });
-  } else {
-    console.warn('GEMINI_API_KEY is not defined in environment variables.');
-  }
-} catch (error) {
-  console.error('Error initializing Gemini SDK:', error);
-}
-
-// In-memory Patent/IP NFT Database
-interface ValidatorReport {
-  name: string;
-  role: string;
-  decision: 'APPROVED' | 'REJECTED';
-  noveltyScore: number;
-  inventiveScore: number;
-  utilityScore: number;
-  rationale: string;
-  priorArtReferences: string[];
-}
-
-interface PatentNFT {
-  id: string;
-  title: string;
-  creator: string;
-  category: string;
-  abstract: string;
-  claims: string;
-  supportingUrl: string;
-  mintedAt: string;
-  status: 'APPROVED' | 'REJECTED' | 'DISPUTED' | 'REVOKED';
-  tier: 'GOLD' | 'SILVER' | 'BRONZE' | 'NONE';
-  averageScore: number;
-  certificateStyle: {
-    bgGradient: string;
-    borderColor: string;
-    glowColor: string;
-  };
-  validators: ValidatorReport[];
-  challenges: {
-    challenger: string;
-    challengerExplanation: string;
-    challengeUrl: string;
-    timestamp: string;
-    resolution?: string;
-  }[];
-}
-
-const initialPatents: PatentNFT[] = [
+// In-memory Ledger State
+let nfts: NFT_Record[] = [
   {
-    id: "GL-NFT-001",
-    title: "Quantum-Resistant Decentralized Multi-Party Computation Identity Wallet",
-    creator: "Dr. Alice Vance",
-    category: "Cryptography & Network Security",
-    abstract: "A novel protocol combining lattices with decentralized multi-party computation (MPC) to establish a keyless, post-quantum secure cryptographic wallet. Shards of the private keys are mathematically proved to never exist on any single device, using multi-source zero-knowledge proofs.",
-    claims: "1. A method for post-quantum secure distributed threshold signature generation.\n2. Verification of state transitions using lattice-based zero-knowledge proofs over public ledgers.\n3. Dynamic shard reshuffling via an interactive verifiable secret sharing scheme.",
-    supportingUrl: "https://arxiv.org/abs/crypto-mpc-identity-quantum",
-    mintedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "APPROVED",
-    tier: "GOLD",
-    averageScore: 94,
-    certificateStyle: {
-      bgGradient: "from-slate-900 via-indigo-950 to-purple-950",
-      borderColor: "border-indigo-500",
-      glowColor: "rgba(99, 102, 241, 0.4)"
-    },
+    token_id: "1",
+    title: "Ethereal Echoes of Genesis",
+    creator: "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd",
+    owner: "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd",
+    description: "An immersive generative artwork capturing the birth of decentralized consensus. Multi-layered vectors representing independent validator threads reconciling in a single crystalline orbit.",
+    media_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+    category: "Digital Art",
+    minted_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    authenticity_score: 96,
+    authenticity_status: "VERIFIED_ORIGINAL",
+    similar_works_found: [
+      {
+        url: "https://behance.net/gallery/10928/generative-orbits",
+        description: "Vaguely similar geometric orbits, but using flat raster renderings and published post-facto."
+      }
+    ],
+    parent_token_id: null,
+    derivative_similarity_score: null,
+    royalty_bps_to_parent: 0,
+    audit_history: [
+      {
+        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        score_before: 96,
+        score_after: 96,
+        findings: "Continuous audit completed. Scanned 4 major NFT marketplaces and Google Images. No earlier visual matches found. Status confirmed as VERIFIED_ORIGINAL.",
+        triggered_by: "0x89FdBba77299a9a304859aef901b007ea1221fbc"
+      }
+    ],
+    challenge_history: [],
     validators: [
       {
         name: "Scholar AI",
-        role: "Academic & Prior Art Examiner",
+        role: "Prior Art Crawler",
         decision: "APPROVED",
-        noveltyScore: 95,
-        inventiveScore: 92,
-        utilityScore: 90,
-        rationale: "This protocol successfully addresses the threshold secret-sharing vulnerabilities under quantum computing threats by adopting lattice schemes (specifically Kyber/Saber-like parameters). Prior art search did not reveal any active decentralized identity models merging MPC reshuffling with active lattice structures in production.",
-        priorArtReferences: ["NIST Post-Quantum Cryptography Standardization", "Threshold Cryptography with Lattices (IEEE 2024)"]
+        originalityScore: 97,
+        similarityScore: null,
+        rationale: "Crawl of Behance, ArtStation, and on-chain registries yielded no prior matches for this specific generative seed. Completely original composition.",
+        evidenceFound: []
       },
       {
         name: "Legal Counsel AI",
-        role: "Patent Legal Advisor",
+        role: "Jurisdiction & IP Audit",
         decision: "APPROVED",
-        noveltyScore: 94,
-        inventiveScore: 95,
-        utilityScore: 92,
-        rationale: "The claims are highly structured and satisfy statutory patentability criteria: novelty, non-obviousness, and industrial utility. Claim 1 defines a highly technical transition step that represents a major leap over standard Shamir secret sharing which is vulnerable to active adversaries.",
-        priorArtReferences: ["US Patent US11823901B2 - Threshold Signature Management"]
+        originalityScore: 95,
+        similarityScore: null,
+        rationale: "Description boundaries are unique and satisfy statutory originality thresholds under non-obviousness guidelines.",
+        evidenceFound: []
       },
       {
         name: "Industry Expert AI",
-        role: "Systems Architect & Feasibility Auditor",
+        role: "Style & Authenticity Auditor",
         decision: "APPROVED",
-        noveltyScore: 92,
-        inventiveScore: 94,
-        utilityScore: 98,
-        rationale: "The architecture offers outstanding performance. With the rising threat of quantum decryptors, this identity architecture has immediate, critical commercial application in institutional custody and secure state networks. It's fully compatible with standard Web3 interfaces.",
-        priorArtReferences: []
+        originalityScore: 96,
+        similarityScore: null,
+        rationale: "The generative visual signature is novel. Excellent utilization of the canvas. No plagiarism markers found.",
+        evidenceFound: []
       }
-    ],
-    challenges: []
+    ]
   },
   {
-    id: "GL-NFT-002",
-    title: "Self-Healing Bio-Polymer Solar Film coating",
-    creator: "Julian Thorne",
-    category: "CleanTech & Renewable Energy",
-    abstract: "A sprayable polymer coating containing vascularized micro-capsules filled with conductive organic solar polymers. When micro-fractures occur due to physical damage or weathering, the capsules rupture, polymerizing and restoring solar energy transmission within seconds.",
-    claims: "1. A dynamic self-healing photovoltaic polymer containing dispersed liquid conductive monomer complexes.\n2. A micro-vascular matrix embedded in synthetic elastomer sheets configured to heal conductive micro-lines.",
-    supportingUrl: "https://nature.org/materials-solar-selfhealing-coating",
-    mintedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "APPROVED",
-    tier: "SILVER",
-    averageScore: 83,
-    certificateStyle: {
-      bgGradient: "from-emerald-950 via-teal-950 to-slate-900",
-      borderColor: "border-emerald-500",
-      glowColor: "rgba(16, 185, 129, 0.4)"
-    },
+    token_id: "2",
+    title: "Ethereal Echoes: Golden Remix",
+    creator: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
+    owner: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
+    description: "A golden, high-contrast reimagining of Ethereal Echoes (#1). Infused with metallic gradients, dynamic particle streams, and slow-motion canvas rotations.",
+    media_url: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop",
+    category: "Digital Art",
+    minted_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    authenticity_score: 85,
+    authenticity_status: "VERIFIED_ORIGINAL",
+    similar_works_found: [],
+    parent_token_id: "1",
+    derivative_similarity_score: 65,
+    royalty_bps_to_parent: 650, // 6.5% royalty to parent
+    audit_history: [],
+    challenge_history: [],
     validators: [
       {
         name: "Scholar AI",
-        role: "Academic & Prior Art Examiner",
+        role: "Prior Art Crawler",
         decision: "APPROVED",
-        noveltyScore: 85,
-        inventiveScore: 80,
-        utilityScore: 88,
-        rationale: "Self-healing elastomers are well-documented (e.g., White et al., 2001). However, encapsulating active conductive photopolymers within vascularized structures to restore electricity generation represents a clear novel development. Prior works only healed physical structure, not photovoltaic continuity.",
-        priorArtReferences: ["Autonomic healing of polymer composites (Nature 2001)", "Flexible photovoltaic skin developments"]
+        originalityScore: 88,
+        similarityScore: 65,
+        rationale: "Perfect alignment as a transformative remix. The golden noise overlay is technically distinct while cleanly preserving the original vector seed of Genesis Proof #1.",
+        evidenceFound: []
       },
       {
         name: "Legal Counsel AI",
-        role: "Patent Legal Advisor",
+        role: "Jurisdiction & IP Audit",
         decision: "APPROVED",
-        noveltyScore: 82,
-        inventiveScore: 78,
-        utilityScore: 82,
-        rationale: "The claims overlap slightly with broad self-healing polymer patents but the specificity of solar conductive microcapsules is sufficiently distinct. Recommend granting the patent with modified claim boundaries limiting scope to photovoltaic restoration.",
-        priorArtReferences: ["US Patent US9276492 - Self-healing conductive coatings"]
+        originalityScore: 84,
+        similarityScore: 62,
+        rationale: "Derivative claims are fully compliant. Royalty rate of 6.5% successfully locked to the parent token creator.",
+        evidenceFound: []
       },
       {
         name: "Industry Expert AI",
-        role: "Systems Architect & Feasibility Auditor",
+        role: "Style & Authenticity Auditor",
         decision: "APPROVED",
-        noveltyScore: 80,
-        inventiveScore: 85,
-        utilityScore: 89,
-        rationale: "Manufacturing micro-capsules at this scale is expensive but highly feasible. Implementing this on solar arrays in extreme desert climates would reduce maintenance overheads by up to 40%, generating substantial industrial value.",
-        priorArtReferences: []
+        originalityScore: 83,
+        similarityScore: 68,
+        rationale: "Visually striking remix. High quality and clearly acknowledges its lineage. High commercial appeal.",
+        evidenceFound: []
+      }
+    ]
+  },
+  {
+    token_id: "3",
+    title: "The Codex of Autonomous Agents",
+    creator: "0x55Fd88Cc11Dda77a9a304859aef901b007ea1221",
+    owner: "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8",
+    description: "A full-length speculative essay detailing the political economy of networks populated purely by autonomous LLM instances.",
+    media_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop",
+    category: "Text/Literary",
+    minted_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    authenticity_score: 38,
+    authenticity_status: "DISPUTED",
+    similar_works_found: [
+      {
+        url: "https://medium.com/autonomous-networks/codex-draft-2025",
+        description: "Paragraphs 4-12 are nearly identical to a Medium draft posted in late 2025 by a third party."
       }
     ],
-    challenges: []
+    parent_token_id: null,
+    derivative_similarity_score: null,
+    royalty_bps_to_parent: 0,
+    audit_history: [
+      {
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        score_before: 82,
+        score_after: 38,
+        findings: "Audit triggered by authenticity challenge. Re-evaluation found 45% matching text with pre-existing Medium publication from 2025. Score decayed dynamically.",
+        triggered_by: "0x77ff81a299a9a30485aef901b007ea1221fbc44"
+      }
+    ],
+    challenge_history: [
+      {
+        challenger: "0x77ff81a299a9a30485aef901b007ea1221fbc44",
+        evidence_url: "https://medium.com/autonomous-networks/codex-draft-2025",
+        explanation: "This paper copies entire sections from my published Medium post of November 2025 without citation or modification.",
+        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        status: "DISPUTED",
+        resolution: "Upheld in part. Validators reached consensus that substantial textual correlation exists. Status set to DISPUTED. Authenticity score decayed dynamically via 70/30 weight formula."
+      }
+    ],
+    validators: [
+      {
+        name: "Scholar AI",
+        role: "Prior Art Crawler",
+        decision: "APPROVED",
+        originalityScore: 82,
+        similarityScore: null,
+        rationale: "Initial audit did not flag the Medium drafts category index due to rate-limiting, but marked the essay structure as well-argued.",
+        evidenceFound: []
+      },
+      {
+        name: "Legal Counsel AI",
+        role: "Jurisdiction & IP Audit",
+        decision: "APPROVED",
+        originalityScore: 85,
+        similarityScore: null,
+        rationale: "Formal claims of authorship were submitted under self-attestation. Approved with standard disclaimers.",
+        evidenceFound: []
+      },
+      {
+        name: "Industry Expert AI",
+        role: "Style & Authenticity Auditor",
+        decision: "APPROVED",
+        originalityScore: 80,
+        similarityScore: null,
+        rationale: "Strong technical prose with applicable frameworks. High reference utility.",
+        evidenceFound: []
+      }
+    ]
   }
 ];
 
-let patentsDatabase = [...initialPatents];
+let nextTokenId = 4;
 
-// --- API Endpoints ---
-
-// Get all patents
-app.get('/api/patents', (req, res) => {
-  res.json(patentsDatabase);
-});
-
-// Register and evaluate patent with GenLayer Consensus
-app.post('/api/patents/register', async (req, res) => {
-  const { title, creator, category, abstract, claims, supportingUrl } = req.body;
-
-  if (!title || !creator || !category || !abstract || !claims) {
-    return res.status(400).json({ error: 'All fields except supporting URL are required.' });
-  }
-
-  const simulatedPatentId = `GL-NFT-${Math.floor(100 + Math.random() * 900)}`;
-
-  if (!ai) {
-    // Fail-safe fall-back in case Gemini API key is missing (generate mock realistic result)
-    console.warn('Gemini API is not configured. Simulating consensus offline.');
-    const scores = [80 + Math.floor(Math.random() * 15), 78 + Math.floor(Math.random() * 17), 82 + Math.floor(Math.random() * 15)];
-    const avg = Math.round((scores[0] + scores[1] + scores[2]) / 3);
-    const tier = avg >= 90 ? 'GOLD' : avg >= 80 ? 'SILVER' : 'BRONZE';
-    const isApproved = avg >= 75;
-
-    const offlinePatent: PatentNFT = {
-      id: simulatedPatentId,
-      title,
-      creator,
-      category,
-      abstract,
-      claims,
-      supportingUrl: supportingUrl || "",
-      mintedAt: new Date().toISOString(),
-      status: isApproved ? 'APPROVED' : 'REJECTED',
-      tier: isApproved ? tier : 'NONE',
-      averageScore: avg,
-      certificateStyle: getCertificateStyle(tier, isApproved),
-      validators: [
-        {
-          name: "Scholar AI",
-          role: "Academic & Prior Art Examiner",
-          decision: isApproved ? "APPROVED" : "REJECTED",
-          noveltyScore: scores[0],
-          inventiveScore: scores[1] - 3,
-          utilityScore: scores[2] - 2,
-          rationale: "Evaluation conducted offline. The abstract shows solid integration of concepts with no obvious pre-existing combinations detected in the standard baseline domain. Uniqueness criteria matched successfully.",
-          priorArtReferences: ["Simulated Baseline Archive Vol 4", "Internet Standards Draft 2026"]
-        },
-        {
-          name: "Legal Counsel AI",
-          role: "Patent Legal Advisor",
-          decision: isApproved ? "APPROVED" : "REJECTED",
-          noveltyScore: scores[0] - 2,
-          inventiveScore: scores[1],
-          utilityScore: scores[2] - 4,
-          rationale: "Offline legal analysis finds that the claims meet standard statutory subject matter under 35 U.S.C. 101. No identical claim structures are flagged. Fully patentable under standard GenLayer guidelines.",
-          priorArtReferences: []
-        },
-        {
-          name: "Industry Expert AI",
-          role: "Systems Architect & Feasibility Auditor",
-          decision: isApproved ? "APPROVED" : "REJECTED",
-          noveltyScore: scores[0] - 4,
-          inventiveScore: scores[1] - 1,
-          utilityScore: scores[2],
-          rationale: "The proposed dynamic implementation is technically feasible and addresses a substantial engineering bottle-neck, representing concrete industrial utility.",
-          priorArtReferences: []
-        }
-      ],
-      challenges: []
-    };
-
-    patentsDatabase.unshift(offlinePatent);
-    return res.json(offlinePatent);
-  }
-
-  try {
-    // Call Gemini API with Google Search Grounding to simulate web lookup + intelligent consensus
-    const prompt = `
-You are acting as the decentralized GenLayer Validator consensus network. 
-A user has submitted an Invention / Patent application to be evaluated and minted as an Intellectual Property Smart NFT.
-Under GenLayer consensus rules, you must run 3 independent Validator roles, fetch information about potential prior art from the web, and output their evaluations and a final consensus decision.
-
-SUBMISSION DETAILS:
-- Title: ${title}
-- Creator: ${creator}
-- Category: ${category}
-- Abstract: ${abstract}
-- Claims: ${claims}
-- Supporting URL/References: ${supportingUrl || "None provided"}
-
-You MUST provide a detailed output representing the 3 independent validators:
-1. Validator 1: "Scholar AI" (Academic & Prior Art Examiner)
-2. Validator 2: "Legal Counsel AI" (Patent Legal Advisor)
-3. Validator 3: "Industry Expert AI" (Systems Architect & Feasibility Auditor)
-
-For each validator, you must:
-- Analyze if similar inventions exist on the web (use your search grounding to look up recent, real technologies).
-- Give a decision ("APPROVED" or "REJECTED"). Note: To be approved, an invention must be truly novel, non-obvious, and have utility.
-- Assign a score (1 to 100) for: Novelty, Inventive Step (Non-obviousness), and Industrial Applicability (Utility).
-- Write a 2-3 sentence rationale in English. Keep it elegant, technical, authentic, and detailed.
-- Cite real or highly realistic prior art papers, websites, or patents found during search grounding.
-
-Then calculate the CONSENSUS outcome:
-- If at least 2 out of 3 validators APPROVED, the patent is "APPROVED". Average score determines the Tier:
-  - Avg >= 90: "GOLD" Tier (Extremely innovative, pristine claims, highly secure/impactful)
-  - Avg >= 80 and < 90: "SILVER" Tier (High novelty, clear inventive step, strong utility)
-  - Avg >= 70 and < 80: "BRONZE" Tier (Solid utility and novelty, minor overlaps)
-  - Avg < 70: "REJECTED" (Major prior art found, too obvious, or lacks utility)
-- If consensus is APPROVED, decide on the dynamic Visual Certificate Style (border color and premium gradients representing its tier).
-
-Return the response STRICTLY as a single JSON object. Do not include any markdown or backticks (unless required by MIME type). Match this exact JSON structure:
-{
-  "status": "APPROVED" | "REJECTED",
-  "tier": "GOLD" | "SILVER" | "BRONZE" | "NONE",
-  "averageScore": number,
-  "certificateStyle": {
-    "bgGradient": "string (e.g. from-slate-900 via-indigo-950 to-purple-950)",
-    "borderColor": "string (e.g. border-indigo-500)",
-    "glowColor": "string (e.g. rgba(99, 102, 241, 0.4))"
+let listings: Listing[] = [
+  {
+    token_id: "2",
+    seller: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
+    price: "4.5",
+    listed_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    active: true
   },
-  "validators": [
+  {
+    token_id: "3",
+    seller: "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8",
+    price: "1.2",
+    listed_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    active: true
+  }
+];
+
+// Account Balances & Pending Withdrawals Map
+let pendingWithdrawals: Record<string, string> = {
+  "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd": "0.0",
+  "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a": "0.0",
+  "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8": "0.0"
+};
+
+// Protocol Fees collected by Contract
+let contractTreasury = "0.05";
+
+// Running logs of GenLayer Virtual Machine (GLVM) execution
+interface GLVMLog {
+  timestamp: string;
+  txHash: string;
+  method: string;
+  message: string;
+  type: 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR';
+}
+
+let glvmLogs: GLVMLog[] = [
+  {
+    timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    txHash: "0x8fa3...b9e2",
+    method: "DEPLOY",
+    message: "GenesisProof Contract deployed successfully at Address 0xGP_Protocol_v1",
+    type: 'SUCCESS'
+  },
+  {
+    timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    txHash: "0x8fa3...b9e2",
+    method: "INIT",
+    message: "Protocol constants set: protocol_fee_bps = 250 (2.5%)",
+    type: 'INFO'
+  }
+];
+
+function addLog(method: string, message: string, type: 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR' = 'INFO') {
+  const hash = '0x' + Math.random().toString(16).substr(2, 8) + '...' + Math.random().toString(16).substr(2, 4);
+  glvmLogs.unshift({
+    timestamp: new Date().toISOString(),
+    txHash: hash,
+    method,
+    message,
+    type
+  });
+  if (glvmLogs.length > 100) glvmLogs.pop();
+}
+
+// REST APIs
+app.get('/api/nfts', (req, res) => {
+  res.json(nfts);
+});
+
+app.get('/api/listings', (req, res) => {
+  res.json(listings.filter(l => l.active));
+});
+
+app.get('/api/logs', (req, res) => {
+  res.json(glvmLogs);
+});
+
+app.get('/api/balances/:address', (req, res) => {
+  const address = req.params.address;
+  const pending = pendingWithdrawals[address] || "0.0";
+  res.json({
+    address,
+    pending_withdrawals: pending
+  });
+});
+
+app.post('/api/accounts/claim', (req, res) => {
+  const { address } = req.body;
+  if (!address) {
+    return res.status(400).json({ error: "Address is required" });
+  }
+  const pending = pendingWithdrawals[address] || "0.0";
+  const val = parseFloat(pending);
+  if (val <= 0) {
+    return res.status(400).json({ error: "No pending funds to withdraw" });
+  }
+
+  pendingWithdrawals[address] = "0.0";
+  addLog("CLAIM_PROCEEDS", `Account ${address} successfully withdrew ${val} GETH`, 'SUCCESS');
+  res.json({ success: true, withdrawn: val.toString() });
+});
+
+// Helper to simulate GenLayer Web Crawl & Consensus Decision deterministically
+function runGenLayerConsensusSimulation(
+  title: string,
+  description: string,
+  category: string,
+  media_url: string,
+  parentTokenId: string | null = null
+) {
+  // We'll generate dynamic scoring based on inputs to make it highly organic and interesting.
+  // Seed the generator slightly with length of string to be deterministic yet realistic.
+  const seedVal = (title.length + description.length + category.length) % 30;
+  
+  // Base Originality calculation
+  let baseOriginality = 82 + (seedVal % 15); // ranges 82 to 96
+  
+  // Let's create realistic plagiarisms if user enters specific keywords
+  const lowercaseTitle = title.toLowerCase();
+  const lowercaseDesc = description.toLowerCase();
+  const isPlagiarized = lowercaseTitle.includes("copy") || lowercaseTitle.includes("plagiarized") || lowercaseDesc.includes("stolen") || lowercaseDesc.includes("replica");
+  const isSuspicious = lowercaseTitle.includes("remix") && !parentTokenId || lowercaseDesc.includes("similar") || lowercaseTitle.includes("test-suspicious");
+
+  if (isPlagiarized) {
+    baseOriginality = 25 + (seedVal % 10); // Reject threshold
+  } else if (isSuspicious) {
+    baseOriginality = 55 + (seedVal % 10); // Probable original
+  }
+
+  // If derivative, similarity score
+  let similarityScore: number | null = null;
+  if (parentTokenId) {
+    // Determine similarity from keywords
+    similarityScore = 40 + (seedVal % 45); // 40% to 85% similarity
+    if (lowercaseTitle.includes("identical") || lowercaseDesc.includes("exact copy")) {
+      similarityScore = 95; // Reject threshold for similarity
+    } else if (lowercaseTitle.includes("very different")) {
+      similarityScore = 25; // Treat as independent original
+    }
+  }
+
+  // Formulate 3 mock validator reviews with detailed rationales
+  const validators: ValidatorReport[] = [
     {
-      "name": "Scholar AI",
-      "role": "Academic & Prior Art Examiner",
-      "decision": "APPROVED" | "REJECTED",
-      "noveltyScore": number,
-      "inventiveScore": number,
-      "utilityScore": number,
-      "rationale": "string in English",
-      "priorArtReferences": ["string"]
+      name: "Scholar AI",
+      role: "Prior Art Crawler",
+      decision: baseOriginality >= 40 ? 'APPROVED' : 'REJECTED',
+      originalityScore: baseOriginality + 1,
+      similarityScore: similarityScore ? Math.min(100, similarityScore + 2) : null,
+      rationale: baseOriginality >= 40
+        ? `Crawl of scientific database indexes, OpenSea, and Rarible APIs showed no pre-existing match for this submission. Plagiarism index is clean under ${category}.`
+        : `CRITICAL MATCH FOUND: Detected high textual/structural correlation (84%) with on-chain metadata records published on an EVM chain in 2024. Non-original content.`,
+      evidenceFound: baseOriginality >= 40 ? [] : [{ url: "https://opensea.io/assets/plagiarized-record-2024", description: "Direct visual & description overlap detected on OpenSea static cache." }]
     },
-    ... (repeat for Legal Counsel AI and Industry Expert AI)
-  ]
+    {
+      name: "Legal Counsel AI",
+      role: "Jurisdiction & IP Audit",
+      decision: baseOriginality >= 40 ? 'APPROVED' : 'REJECTED',
+      originalityScore: baseOriginality - 1,
+      similarityScore: similarityScore ? Math.max(0, similarityScore - 3) : null,
+      rationale: baseOriginality >= 40
+        ? `No statutory blocks found under USPTO or WIPO guidelines. The claim architecture is clear and unique. Verified for tokenization.`
+        : `Rejection recommended. The core claims are identical to existing foundational assets. Minting would violate anti-plagiarism guidelines.`,
+      evidenceFound: []
+    },
+    {
+      name: "Industry Expert AI",
+      role: "Style & Authenticity Auditor",
+      decision: baseOriginality >= 40 ? 'APPROVED' : 'REJECTED',
+      originalityScore: baseOriginality,
+      similarityScore: similarityScore,
+      rationale: baseOriginality >= 40
+        ? `Visual signature and description are cohesive. High technical quality with distinct characteristics.`
+        : `This asset is a direct duplicate of previously published works. No novelty found in style or content.`,
+      evidenceFound: []
+    }
+  ];
+
+  const avgOriginality = Math.round((validators[0].originalityScore + validators[1].originalityScore + validators[2].originalityScore) / 3);
+  const avgSimilarity = similarityScore !== null
+    ? Math.round(((validators[0].similarityScore || 0) + (validators[1].similarityScore || 0) + (validators[2].similarityScore || 0)) / 3)
+    : null;
+
+  return {
+    validators,
+    avgOriginality,
+    avgSimilarity,
+    isOriginal: avgOriginality >= 40,
+  };
 }
-`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        responseMimeType: 'application/json',
-      }
-    });
-
-    const resultText = response.text || '';
-    const parsedData = JSON.parse(resultText);
-
-    // Build the final NFT record
-    const newPatent: PatentNFT = {
-      id: simulatedPatentId,
-      title,
-      creator,
-      category,
-      abstract,
-      claims,
-      supportingUrl: supportingUrl || "",
-      mintedAt: new Date().toISOString(),
-      status: parsedData.status || 'REJECTED',
-      tier: parsedData.status === 'APPROVED' ? (parsedData.tier || 'BRONZE') : 'NONE',
-      averageScore: parsedData.averageScore || 50,
-      certificateStyle: parsedData.status === 'APPROVED' ? parsedData.certificateStyle : {
-        bgGradient: "from-zinc-900 via-stone-900 to-zinc-950",
-        borderColor: "border-red-500",
-        glowColor: "rgba(239, 68, 68, 0.2)"
-      },
-      validators: parsedData.validators || [],
-      challenges: []
-    };
-
-    // Store in our local "blockchain ledger"
-    patentsDatabase.unshift(newPatent);
-    res.json(newPatent);
-
-  } catch (error: any) {
-    console.error('Error executing GenLayer AI Consensus:', error);
-    res.status(500).json({ error: 'Failed to run AI consensus engine.', details: error.message });
+// 1. MINT NFT
+app.post('/api/nfts/mint', (req, res) => {
+  const { title, description, media_url, category, creator, fee_sent } = req.body;
+  if (!title || !description || !media_url || !category || !creator) {
+    return res.status(400).json({ error: "Missing required minting parameters." });
   }
+
+  addLog("MINT_NFT", `Simulating GenLayer multi-agent consensus for: "${title}"`, 'INFO');
+
+  const simulation = runGenLayerConsensusSimulation(title, description, category, media_url);
+
+  // If rejected
+  if (!simulation.isOriginal || simulation.avgOriginality < 40) {
+    addLog("MINT_NFT", `Mint REJECTED for "${title}". Originality Score (${simulation.avgOriginality}) below threshold. Minting fee refunded to ${creator}`, 'ERROR');
+    return res.json({
+      success: false,
+      status: "REJECTED",
+      score: simulation.avgOriginality,
+      validators: simulation.validators,
+      reason: "Proposed artwork lacks sufficient novelty and conflicts with pre-existing web resources."
+    });
+  }
+
+  // Mint Success
+  const tokenId = (nextTokenId++).toString();
+  const status = simulation.avgOriginality >= 85 ? "VERIFIED_ORIGINAL" : "PROBABLE_ORIGINAL";
+
+  const newNFT: NFT_Record = {
+    token_id: tokenId,
+    creator,
+    owner: creator,
+    title,
+    description,
+    media_url,
+    category,
+    minted_at: new Date().toISOString(),
+    authenticity_score: simulation.avgOriginality,
+    authenticity_status: status,
+    similar_works_found: simulation.avgOriginality >= 85 ? [] : [{ url: "https://google.com/search?q=" + encodeURIComponent(title), description: "Closest matching semantic title patterns discovered." }],
+    parent_token_id: null,
+    derivative_similarity_score: null,
+    royalty_bps_to_parent: 0,
+    audit_history: [
+      {
+        timestamp: new Date().toISOString(),
+        score_before: simulation.avgOriginality,
+        score_after: simulation.avgOriginality,
+        findings: `Initial GenLayer verification complete. Status set to ${status}. Agreement reached across all 3 nodes.`,
+        triggered_by: "0xGP_Protocol_v1"
+      }
+    ],
+    challenge_history: [],
+    validators: simulation.validators
+  };
+
+  nfts.unshift(newNFT);
+
+  // Overpay refund simulation
+  const sent = parseFloat(fee_sent || "0.1");
+  const required = 0.05;
+  if (sent > required) {
+    const refund = (sent - required).toFixed(3);
+    pendingWithdrawals[creator] = (parseFloat(pendingWithdrawals[creator] || "0.0") + parseFloat(refund)).toFixed(3);
+    addLog("MINT_NFT", `Excess fee of ${refund} GETH routed to pending withdrawals for ${creator}`, 'SUCCESS');
+  }
+
+  contractTreasury = (parseFloat(contractTreasury) + required).toFixed(3);
+
+  addLog("MINT_NFT", `NFT Minted Successfully! Token ID: ${tokenId} | Status: ${status} | Score: ${simulation.avgOriginality}`, 'SUCCESS');
+
+  res.json({
+    success: true,
+    token_id: tokenId,
+    nft: newNFT
+  });
 });
 
-// Challenge an existing patent
-app.post('/api/patents/challenge', async (req, res) => {
-  const { id, challenger, challengerExplanation, challengeUrl } = req.body;
-
-  if (!id || !challenger || !challengerExplanation) {
-    return res.status(400).json({ error: 'Patent ID, challenger name, and explanation are required.' });
+// 2. MINT DERIVATIVE
+app.post('/api/nfts/mint-derivative', (req, res) => {
+  const { parent_token_id, title, description, media_url, creator, fee_sent } = req.body;
+  if (!parent_token_id || !title || !description || !media_url || !creator) {
+    return res.status(400).json({ error: "Missing required derivative mint parameters." });
   }
 
-  const patentIndex = patentsDatabase.findIndex(p => p.id === id);
-  if (patentIndex === -1) {
-    return res.status(404).json({ error: 'Patent NFT not found.' });
+  const parentNFT = nfts.find(n => n.token_id === parent_token_id);
+  if (!parentNFT) {
+    return res.status(400).json({ error: "Parent NFT not found on-chain." });
   }
 
-  const patent = patentsDatabase[patentIndex];
+  addLog("MINT_DERIVATIVE", `Evaluating remix lineage against parent NFT #${parent_token_id}`, 'INFO');
 
-  if (!ai) {
-    // Offline simulation of challenge validation
-    const offlineChallenge = {
-      challenger,
-      challengerExplanation,
-      challengeUrl: challengeUrl || "",
-      timestamp: new Date().toISOString(),
-      resolution: "The GenLayer validators evaluated the challenge. Although some prior art was referenced, the patent claims were successfully defended by modifying the scope. Patent remains valid but status set to DISPUTED."
-    };
-    patent.status = 'DISPUTED';
-    patent.challenges.push(offlineChallenge);
-    return res.json(patent);
+  const simulation = runGenLayerConsensusSimulation(title, description, parentNFT.category, media_url, parent_token_id);
+
+  const avgSimilarity = simulation.avgSimilarity || 50;
+
+  // 1. similarity >= 90 -> Treat as duplicate, reject
+  if (avgSimilarity >= 90) {
+    addLog("MINT_DERIVATIVE", `Mint REJECTED for "${title}": Duplicate likeness to parent (Similarity: ${avgSimilarity}%). Fee refunded.`, 'ERROR');
+    return res.json({
+      success: false,
+      status: "REJECTED",
+      reason: `Proposed derivative is too similar to the parent NFT. Plagiarism threshold (90%) exceeded. Detected ${avgSimilarity}% likeness.`
+    });
   }
 
-  try {
-    // Challenge validation on-chain via GenLayer AI Validators
-    const prompt = `
-You are running a GenLayer Patent Revocation/Challenge smart contract function.
-A citizen has submitted a formal challenge against an approved Patent NFT on our network, claiming it violates novelty or includes undocumented prior art.
+  // 2. similarity < 30 -> Independent
+  const isIndependent = avgSimilarity < 30;
+  const tokenId = (nextTokenId++).toString();
+  const royaltyBps = isIndependent ? 0 : Math.round(avgSimilarity * 10); // e.g. 50% similarity -> 500 bps (5%)
+  const status = simulation.avgOriginality >= 85 ? "VERIFIED_ORIGINAL" : "PROBABLE_ORIGINAL";
 
-PATENT TO RE-EVALUATE:
-- Title: ${patent.title}
-- Original Creator: ${patent.creator}
-- Category: ${patent.category}
-- Abstract: ${patent.abstract}
-- Claims: ${patent.claims}
-
-CHALLENGE DETAILS:
-- Challenger: ${challenger}
-- Challenger's Explanation & Evidence: ${challengerExplanation}
-- Challenge URL/Link: ${challengeUrl || "None"}
-
-Please simulate the 3 validators ("Scholar AI", "Legal Counsel AI", "Industry Expert AI") re-evaluating the patent in light of the new evidence.
-Decide on a consensus resolution:
-1. "UPHELD": The challenge lacks merit or doesn't invalidate the patent. Patent remains APPROVED.
-2. "DISPUTED / MODIFIED": The challenge has some merit; the patent remains approved but state is changed to DISPUTED.
-3. "REVOKED": The challenge provides clear, unarguable prior art. The patent NFT is officially REVOKED.
-
-Return a JSON object with this exact schema:
-{
-  "newStatus": "APPROVED" | "DISPUTED" | "REVOKED",
-  "resolution": "A 3-4 sentence detailed summary in English explaining the validators' joint consensus on why the patent was upheld, disputed, or revoked, referencing the challenger's links/arguments."
-}
-`;
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        responseMimeType: 'application/json',
+  const newNFT: NFT_Record = {
+    token_id: tokenId,
+    creator,
+    owner: creator,
+    title,
+    description,
+    media_url,
+    category: parentNFT.category,
+    minted_at: new Date().toISOString(),
+    authenticity_score: simulation.avgOriginality,
+    authenticity_status: status,
+    similar_works_found: [],
+    parent_token_id: isIndependent ? null : parent_token_id,
+    derivative_similarity_score: isIndependent ? null : avgSimilarity,
+    royalty_bps_to_parent: royaltyBps,
+    audit_history: [
+      {
+        timestamp: new Date().toISOString(),
+        score_before: simulation.avgOriginality,
+        score_after: simulation.avgOriginality,
+        findings: isIndependent
+          ? `GenLayer evaluated claims: Determined work is structurally independent of Parent NFT #${parent_token_id} (Similarity: ${avgSimilarity}% < 30%). Minted as standalone.`
+          : `GenLayer Remix authorization: Minted as legitimate derivative of NFT #${parent_token_id}. Locked ${royaltyBps / 100}% royalty share directly to parent creator ${parentNFT.creator}.`,
+        triggered_by: "0xGP_Protocol_v1"
       }
-    });
+    ],
+    challenge_history: [],
+    validators: simulation.validators
+  };
 
-    const parsedData = JSON.parse(response.text || '{}');
-    const newStatus = parsedData.newStatus || 'DISPUTED';
-    const resolution = parsedData.resolution || 'Challenge processed successfully.';
+  nfts.unshift(newNFT);
 
-    patent.status = newStatus;
-    patent.challenges.push({
-      challenger,
-      challengerExplanation,
-      challengeUrl: challengeUrl || "",
-      timestamp: new Date().toISOString(),
-      resolution
-    });
-
-    res.json(patent);
-  } catch (error: any) {
-    console.error('Error running challenge resolution:', error);
-    res.status(500).json({ error: 'Failed to process patent challenge.', details: error.message });
+  const sent = parseFloat(fee_sent || "0.1");
+  const required = 0.05;
+  if (sent > required) {
+    const refund = (sent - required).toFixed(3);
+    pendingWithdrawals[creator] = (parseFloat(pendingWithdrawals[creator] || "0.0") + parseFloat(refund)).toFixed(3);
   }
+  contractTreasury = (parseFloat(contractTreasury) + required).toFixed(3);
+
+  addLog("MINT_DERIVATIVE", `Derivative NFT #${tokenId} minted. Similarity: ${avgSimilarity}% | Royalty: ${royaltyBps / 100}%`, 'SUCCESS');
+
+  res.json({
+    success: true,
+    token_id: tokenId,
+    nft: newNFT
+  });
 });
 
-// Helper to determine style
-function getCertificateStyle(tier: string, isApproved: boolean) {
-  if (!isApproved) {
-    return {
-      bgGradient: "from-zinc-900 via-stone-900 to-zinc-950",
-      borderColor: "border-red-500",
-      glowColor: "rgba(239, 68, 68, 0.2)"
-    };
+// 3. AUDIT PROVENANCE
+app.post('/api/nfts/audit', (req, res) => {
+  const { token_id, caller } = req.body;
+  if (!token_id) {
+    return res.status(400).json({ error: "Token ID is required." });
   }
-  switch (tier) {
-    case 'GOLD':
-      return {
-        bgGradient: "from-slate-900 via-indigo-950 to-purple-950",
-        borderColor: "border-indigo-500",
-        glowColor: "rgba(99, 102, 241, 0.4)"
-      };
-    case 'SILVER':
-      return {
-        bgGradient: "from-emerald-950 via-teal-950 to-slate-900",
-        borderColor: "border-emerald-500",
-        glowColor: "rgba(16, 185, 129, 0.4)"
-      };
-    case 'BRONZE':
-      return {
-        bgGradient: "from-amber-950 via-stone-900 to-amber-900",
-        borderColor: "border-amber-600",
-        glowColor: "rgba(245, 158, 11, 0.3)"
-      };
-    default:
-      return {
-        bgGradient: "from-slate-900 to-slate-950",
-        borderColor: "border-slate-700",
-        glowColor: "rgba(255, 255, 255, 0.1)"
-      };
-  }
-}
 
-// Vite and static asset serving
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  addLog("AUDIT_PROVENANCE", `Re-evaluating web registry footprint for NFT #${token_id}`, 'INFO');
+
+  // Simulate a fresh search
+  // Random score fluctuate slightly, decay formula: round(old_score * 0.7 + fresh_score * 0.3)
+  const isBadAudit = Math.random() > 0.85 || nft.title.toLowerCase().includes("decay") || nft.description.toLowerCase().includes("decay");
+  const freshScore = isBadAudit ? Math.floor(20 + Math.random() * 20) : Math.floor(88 + Math.random() * 12);
+  const oldScore = nft.authenticity_score;
+  const decayedScore = Math.round(oldScore * 0.7 + freshScore * 0.3);
+
+  // Status transitions
+  let finalStatus = nft.authenticity_status;
+  let findings = `Continuous search evaluated. Fresh consensus score is ${freshScore}. Decayed average: ${decayedScore}. No conflicting claims.`;
+
+  if (decayedScore < 40) {
+    finalStatus = "DISPUTED";
+    findings = `CRITICAL ALERT: Audit score dropped below threshold (Score: ${decayedScore}). High correlation of copycat activities detected on social feeds.`;
+    addLog("AUDIT_PROVENANCE", `WARNING: NFT #${token_id} score dropped below 40. Down-graded to DISPUTED!`, 'WARNING');
+  } else if (decayedScore >= 85) {
+    finalStatus = "VERIFIED_ORIGINAL";
+  } else {
+    finalStatus = "PROBABLE_ORIGINAL";
+  }
+
+  // Update in state
+  nft.authenticity_score = decayedScore;
+  nft.authenticity_status = finalStatus;
+  nft.audit_history.push({
+    timestamp: new Date().toISOString(),
+    score_before: oldScore,
+    score_after: decayedScore,
+    findings,
+    triggered_by: caller || "0xAnonymous"
+  });
+
+  addLog("AUDIT_PROVENANCE", `Audit Complete for #${token_id}. Current Score: ${decayedScore} | Status: ${finalStatus}`, 'SUCCESS');
+
+  res.json({
+    success: true,
+    nft
+  });
+});
+
+// 4. CHALLENGE AUTHENTICITY
+app.post('/api/nfts/challenge', (req, res) => {
+  const { token_id, challenger, evidence_url, explanation } = req.body;
+  if (!token_id || !challenger || !explanation) {
+    return res.status(400).json({ error: "Missing required challenge parameters." });
+  }
+
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  addLog("CHALLENGE_AUTHENTICITY", `Active dispute submitted by ${challenger} against NFT #${token_id}`, 'WARNING');
+
+  // Determine outcome based on user-typed explanation
+  // If user writes "proof", "steal", "plagiarize", "stolen" or "revoke" -> Revoke!
+  const lowerExp = explanation.toLowerCase();
+  const lowerUrl = (evidence_url || "").toLowerCase();
+  let outcome: 'UPHELD' | 'DISPUTED' | 'REVOKED' = 'DISPUTED';
+  let scorePenal = 30;
+
+  if (lowerExp.includes("revoke") || lowerExp.includes("stolen") || lowerExp.includes("stole") || lowerUrl.includes("revoke")) {
+    outcome = "REVOKED";
+    scorePenal = 90;
+  } else if (lowerExp.includes("weak") || lowerExp.includes("dismiss") || lowerExp.includes("unfounded")) {
+    outcome = "UPHELD"; // Challenge lacks merit
+    scorePenal = 0;
+  }
+
+  const oldScore = nft.authenticity_score;
+  const newScore = Math.max(0, oldScore - scorePenal);
+  let finalStatus = nft.authenticity_status;
+
+  let resolution = "";
+  if (outcome === "REVOKED") {
+    finalStatus = "REVOKED";
+    resolution = `Challenge UPHELD with maximum confidence. Clear prior art verified at ${evidence_url || "provided citation"}. NFT #${token_id} permanently stripped of its authenticity certificate. Marketplace listing banned.`;
+    addLog("CHALLENGE_AUTHENTICITY", `CRITICAL: NFT #${token_id} has been permanently REVOKED due to verified plagiarism!`, 'ERROR');
+  } else if (outcome === "DISPUTED") {
+    finalStatus = "DISPUTED";
+    resolution = `Challenge has some technical merit. Correlation confirmed but copyright boundary is ambiguous. Status set to DISPUTED. Authenticity score penalized to ${newScore}.`;
+    addLog("CHALLENGE_AUTHENTICITY", `NFT #${token_id} status updated to DISPUTED. Score reduced.`, 'WARNING');
+  } else {
+    resolution = `Challenge dismissed as unsubstantiated. Evidence at ${evidence_url || "URL"} did not match the claim. Authenticity remains verified.`;
+    addLog("CHALLENGE_AUTHENTICITY", `Challenge against NFT #${token_id} dismissed. Status preserved.`, 'SUCCESS');
+  }
+
+  nft.authenticity_score = newScore;
+  nft.authenticity_status = finalStatus;
+
+  const challengeEntry: ChallengeHistoryEntry = {
+    challenger,
+    evidence_url: evidence_url || "",
+    explanation,
+    timestamp: new Date().toISOString(),
+    status: outcome,
+    resolution
+  };
+
+  nft.challenge_history.push(challengeEntry);
+
+  // If revoked, deactivate any active marketplace listing
+  if (finalStatus === "REVOKED") {
+    listings = listings.map(l => {
+      if (l.token_id === token_id) {
+        return { ...l, active: false };
+      }
+      return l;
+    });
+  }
+
+  res.json({
+    success: true,
+    nft,
+    challengeEntry
+  });
+});
+
+// 5. TRANSFER NFT
+app.post('/api/nfts/transfer', (req, res) => {
+  const { token_id, to, caller } = req.body;
+  if (!token_id || !to || !caller) {
+    return res.status(400).json({ error: "Missing transfer parameters." });
+  }
+
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  if (nft.owner.toLowerCase() !== caller.toLowerCase()) {
+    return res.status(403).json({ error: "Caller is not the current token owner." });
+  }
+
+  nft.owner = to;
+  // Deactivate listing if any
+  listings = listings.map(l => {
+    if (l.token_id === token_id) return { ...l, active: false };
+    return l;
+  });
+
+  addLog("TRANSFER_NFT", `NFT #${token_id} manually transferred from ${caller} to ${to}. Creator/provenance history preserved.`, 'SUCCESS');
+
+  res.json({ success: true, nft });
+});
+
+// 6. MARKETPLACE: LIST
+app.post('/api/marketplace/list', (req, res) => {
+  const { token_id, price, seller } = req.body;
+  if (!token_id || !price || !seller) {
+    return res.status(400).json({ error: "Missing parameters." });
+  }
+
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  if (nft.owner.toLowerCase() !== seller.toLowerCase()) {
+    return res.status(403).json({ error: "Caller does not own this NFT" });
+  }
+
+  if (nft.authenticity_status === "REVOKED") {
+    return res.status(400).json({ error: "REVOKED NFTs are banned from the exclusive marketplace." });
+  }
+
+  // Remove existing listing if any
+  listings = listings.filter(l => l.token_id !== token_id);
+
+  const newListing: Listing = {
+    token_id,
+    seller,
+    price: parseFloat(price).toFixed(3),
+    listed_at: new Date().toISOString(),
+    active: true
+  };
+
+  listings.unshift(newListing);
+
+  addLog("MARKETPLACE_LIST", `NFT #${token_id} listed for sale at ${price} GETH by ${seller}`, 'SUCCESS');
+
+  res.json({ success: true, listing: newListing });
+});
+
+// 7. MARKETPLACE: CANCEL
+app.post('/api/marketplace/cancel', (req, res) => {
+  const { token_id, seller } = req.body;
+  if (!token_id || !seller) {
+    return res.status(400).json({ error: "Missing parameters." });
+  }
+
+  const listing = listings.find(l => l.token_id === token_id && l.active);
+  if (!listing) {
+    return res.status(404).json({ error: "Active listing not found" });
+  }
+
+  if (listing.seller.toLowerCase() !== seller.toLowerCase()) {
+    return res.status(403).json({ error: "Caller is not the seller" });
+  }
+
+  listing.active = false;
+  addLog("MARKETPLACE_CANCEL", `Listing for NFT #${token_id} cancelled by seller`, 'INFO');
+
+  res.json({ success: true });
+});
+
+// 8. MARKETPLACE: BUY
+app.post('/api/marketplace/buy', (req, res) => {
+  const { token_id, buyer, amount_sent } = req.body;
+  if (!token_id || !buyer || !amount_sent) {
+    return res.status(400).json({ error: "Missing buy parameters." });
+  }
+
+  const listing = listings.find(l => l.token_id === token_id && l.active);
+  if (!listing) {
+    return res.status(404).json({ error: "Listing is inactive or does not exist." });
+  }
+
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  const priceVal = parseFloat(listing.price);
+  const sentVal = parseFloat(amount_sent);
+
+  if (sentVal < priceVal) {
+    return res.status(400).json({ error: `Insufficient funds sent. Required: ${priceVal} GETH` });
+  }
+
+  // Deactivate listing
+  listing.active = false;
+
+  // Compute splits
+  // 1. Protocol Fee (2.5%)
+  const protocolFeeBps = 250;
+  const feeShare = (priceVal * protocolFeeBps) / 10000;
+  contractTreasury = (parseFloat(contractTreasury) + feeShare).toFixed(3);
+
+  // 2. Lineage Royalty Bps check (if derivative)
+  let royaltyShare = 0;
+  let parentCreator = "";
+  if (nft.parent_token_id && nft.royalty_bps_to_parent > 0) {
+    const parentNFT = nfts.find(p => p.token_id === nft.parent_token_id);
+    if (parentNFT) {
+      parentCreator = parentNFT.creator;
+      royaltyShare = (priceVal * nft.royalty_bps_to_parent) / 10000;
+      pendingWithdrawals[parentCreator] = (parseFloat(pendingWithdrawals[parentCreator] || "0.0") + royaltyShare).toFixed(3);
+    }
+  }
+
+  // 3. Remainder goes to seller
+  const sellerProceeds = priceVal - feeShare - royaltyShare;
+  const seller = listing.seller;
+  pendingWithdrawals[seller] = (parseFloat(pendingWithdrawals[seller] || "0.0") + sellerProceeds).toFixed(3);
+
+  // 4. Overpay refund goes to buyer
+  const overpay = sentVal - priceVal;
+  if (overpay > 0) {
+    pendingWithdrawals[buyer] = (parseFloat(pendingWithdrawals[buyer] || "0.0") + overpay).toFixed(3);
+  }
+
+  // Transfer Ownership
+  const oldOwner = nft.owner;
+  nft.owner = buyer;
+
+  addLog("MARKETPLACE_BUY", `SOLD! NFT #${token_id} bought by ${buyer}. Price: ${priceVal} GETH. Fee: ${feeShare.toFixed(3)}, Royalty: ${royaltyShare.toFixed(3)} to ${parentCreator || "none"}, Proceeds: ${sellerProceeds.toFixed(3)} to ${seller}`, 'SUCCESS');
+
+  res.json({
+    success: true,
+    nft,
+    splits: {
+      price: priceVal,
+      fee: feeShare,
+      royalty: royaltyShare,
+      seller_proceeds: sellerProceeds,
+      refund: overpay
+    }
+  });
+});
+
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  // Vite middleware for development
+  if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: 'spa',
+      appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
@@ -501,8 +856,8 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Genesis Proof server running on http://0.0.0.0:${PORT}`);
   });
 }
 
