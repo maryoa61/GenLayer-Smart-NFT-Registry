@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
-import { NFT_Record, Listing, AuditHistoryEntry, ChallengeHistoryEntry, ValidatorReport } from './src/types';
+import { NFT_Record, ValidatorReport } from './src/types';
 
 dotenv.config();
 
@@ -27,12 +27,9 @@ let nfts: NFT_Record[] = [
     similar_works_found: [
       {
         url: "https://behance.net/gallery/10928/generative-orbits",
-        description: "Vaguely similar geometric orbits, but using flat raster renderings and published post-facto."
+        description: "Vaguely similar geometric orbits, but using flat raster renderings."
       }
     ],
-    parent_token_id: null,
-    derivative_similarity_score: null,
-    royalty_bps_to_parent: 0,
     audit_history: [
       {
         timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
@@ -42,7 +39,6 @@ let nfts: NFT_Record[] = [
         triggered_by: "0x89FdBba77299a9a304859aef901b007ea1221fbc"
       }
     ],
-    challenge_history: [],
     validators: [
       {
         name: "Scholar AI",
@@ -75,29 +71,25 @@ let nfts: NFT_Record[] = [
   },
   {
     token_id: "2",
-    title: "Ethereal Echoes: Golden Remix",
+    title: "Golden Particle Horizon",
     creator: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
     owner: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
-    description: "A golden, high-contrast reimagining of Ethereal Echoes (#1). Infused with metallic gradients, dynamic particle streams, and slow-motion canvas rotations.",
+    description: "A golden, high-contrast digital horizon. Infused with metallic gradients, dynamic particle streams, and slow-motion canvas rotations.",
     media_url: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop",
     category: "Digital Art",
     minted_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     authenticity_score: 85,
     authenticity_status: "VERIFIED_ORIGINAL",
     similar_works_found: [],
-    parent_token_id: "1",
-    derivative_similarity_score: 65,
-    royalty_bps_to_parent: 650, // 6.5% royalty to parent
     audit_history: [],
-    challenge_history: [],
     validators: [
       {
         name: "Scholar AI",
         role: "Prior Art Crawler",
         decision: "APPROVED",
         originalityScore: 88,
-        similarityScore: 65,
-        rationale: "Perfect alignment as a transformative remix. The golden noise overlay is technically distinct while cleanly preserving the original vector seed of Genesis Proof #1.",
+        similarityScore: null,
+        rationale: "Legitimate registration. The golden particle field is highly distinct.",
         evidenceFound: []
       },
       {
@@ -105,8 +97,8 @@ let nfts: NFT_Record[] = [
         role: "Jurisdiction & IP Audit",
         decision: "APPROVED",
         originalityScore: 84,
-        similarityScore: 62,
-        rationale: "Derivative claims are fully compliant. Royalty rate of 6.5% successfully locked to the parent token creator.",
+        similarityScore: null,
+        rationale: "Artistic claim satisfies the non-obviousness criteria.",
         evidenceFound: []
       },
       {
@@ -114,8 +106,8 @@ let nfts: NFT_Record[] = [
         role: "Style & Authenticity Auditor",
         decision: "APPROVED",
         originalityScore: 83,
-        similarityScore: 68,
-        rationale: "Visually striking remix. High quality and clearly acknowledges its lineage. High commercial appeal.",
+        similarityScore: null,
+        rationale: "Visually striking styling. High novelty value.",
         evidenceFound: []
       }
     ]
@@ -125,38 +117,25 @@ let nfts: NFT_Record[] = [
     title: "The Codex of Autonomous Agents",
     creator: "0x55Fd88Cc11Dda77a9a304859aef901b007ea1221",
     owner: "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8",
-    description: "A full-length speculative essay detailing the political economy of networks populated purely by autonomous LLM instances.",
+    description: "A speculative essay detailing the political economy of networks populated purely by autonomous LLM instances.",
     media_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop",
     category: "Text/Literary",
     minted_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    authenticity_score: 38,
-    authenticity_status: "DISPUTED",
+    authenticity_score: 68,
+    authenticity_status: "PROBABLE_ORIGINAL",
     similar_works_found: [
       {
         url: "https://medium.com/autonomous-networks/codex-draft-2025",
-        description: "Paragraphs 4-12 are nearly identical to a Medium draft posted in late 2025 by a third party."
+        description: "Vaguely similar structural concepts regarding agent economies found in a Medium draft from late 2025."
       }
     ],
-    parent_token_id: null,
-    derivative_similarity_score: null,
-    royalty_bps_to_parent: 0,
     audit_history: [
       {
         timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         score_before: 82,
-        score_after: 38,
-        findings: "Audit triggered by authenticity challenge. Re-evaluation found 45% matching text with pre-existing Medium publication from 2025. Score decayed dynamically.",
-        triggered_by: "0x77ff81a299a9a30485aef901b007ea1221fbc44"
-      }
-    ],
-    challenge_history: [
-      {
-        challenger: "0x77ff81a299a9a30485aef901b007ea1221fbc44",
-        evidence_url: "https://medium.com/autonomous-networks/codex-draft-2025",
-        explanation: "This paper copies entire sections from my published Medium post of November 2025 without citation or modification.",
-        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "DISPUTED",
-        resolution: "Upheld in part. Validators reached consensus that substantial textual correlation exists. Status set to DISPUTED. Authenticity score decayed dynamically via 70/30 weight formula."
+        score_after: 68,
+        findings: "Re-evaluation flagged semantic matches on public Medium drafts. Status updated to PROBABLE_ORIGINAL.",
+        triggered_by: "0xGP_Protocol_v1"
       }
     ],
     validators: [
@@ -164,27 +143,27 @@ let nfts: NFT_Record[] = [
         name: "Scholar AI",
         role: "Prior Art Crawler",
         decision: "APPROVED",
-        originalityScore: 82,
+        originalityScore: 72,
         similarityScore: null,
-        rationale: "Initial audit did not flag the Medium drafts category index due to rate-limiting, but marked the essay structure as well-argued.",
+        rationale: "Contains structured explanations but shows minor overlaps with common terminology.",
         evidenceFound: []
       },
       {
         name: "Legal Counsel AI",
         role: "Jurisdiction & IP Audit",
         decision: "APPROVED",
-        originalityScore: 85,
+        originalityScore: 68,
         similarityScore: null,
-        rationale: "Formal claims of authorship were submitted under self-attestation. Approved with standard disclaimers.",
+        rationale: "Approved with cautionary scoring due to generic phrasing in certain paragraphs.",
         evidenceFound: []
       },
       {
         name: "Industry Expert AI",
         role: "Style & Authenticity Auditor",
         decision: "APPROVED",
-        originalityScore: 80,
+        originalityScore: 65,
         similarityScore: null,
-        rationale: "Strong technical prose with applicable frameworks. High reference utility.",
+        rationale: "Novel format of textual presentation, though the concepts are standard across modern AI literature.",
         evidenceFound: []
       }
     ]
@@ -192,33 +171,6 @@ let nfts: NFT_Record[] = [
 ];
 
 let nextTokenId = 4;
-
-let listings: Listing[] = [
-  {
-    token_id: "2",
-    seller: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
-    price: "4.5",
-    listed_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    active: true
-  },
-  {
-    token_id: "3",
-    seller: "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8",
-    price: "1.2",
-    listed_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    active: true
-  }
-];
-
-// Account Balances & Pending Withdrawals Map
-let pendingWithdrawals: Record<string, string> = {
-  "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd": "0.0",
-  "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a": "0.0",
-  "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8": "0.0"
-};
-
-// Protocol Fees collected by Contract
-let contractTreasury = "0.05";
 
 // Running logs of GenLayer Virtual Machine (GLVM) execution
 interface GLVMLog {
@@ -241,13 +193,13 @@ let glvmLogs: GLVMLog[] = [
     timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     txHash: "0x8fa3...b9e2",
     method: "INIT",
-    message: "Protocol constants set: protocol_fee_bps = 250 (2.5%)",
+    message: "Protocol constants set: required_mint_fee = 0.05 GETH",
     type: 'INFO'
   }
 ];
 
 function addLog(method: string, message: string, type: 'INFO' | 'WARNING' | 'SUCCESS' | 'ERROR' = 'INFO') {
-  const hash = '0x' + Math.random().toString(16).substr(2, 8) + '...' + Math.random().toString(16).substr(2, 4);
+  const hash = '0x' + Math.random().toString(16).substring(2, 10) + '...' + Math.random().toString(16).substring(2, 6);
   glvmLogs.unshift({
     timestamp: new Date().toISOString(),
     txHash: hash,
@@ -263,37 +215,8 @@ app.get('/api/nfts', (req, res) => {
   res.json(nfts);
 });
 
-app.get('/api/listings', (req, res) => {
-  res.json(listings.filter(l => l.active));
-});
-
 app.get('/api/logs', (req, res) => {
   res.json(glvmLogs);
-});
-
-app.get('/api/balances/:address', (req, res) => {
-  const address = req.params.address;
-  const pending = pendingWithdrawals[address] || "0.0";
-  res.json({
-    address,
-    pending_withdrawals: pending
-  });
-});
-
-app.post('/api/accounts/claim', (req, res) => {
-  const { address } = req.body;
-  if (!address) {
-    return res.status(400).json({ error: "Address is required" });
-  }
-  const pending = pendingWithdrawals[address] || "0.0";
-  const val = parseFloat(pending);
-  if (val <= 0) {
-    return res.status(400).json({ error: "No pending funds to withdraw" });
-  }
-
-  pendingWithdrawals[address] = "0.0";
-  addLog("CLAIM_PROCEEDS", `Account ${address} successfully withdrew ${val} GETH`, 'SUCCESS');
-  res.json({ success: true, withdrawn: val.toString() });
 });
 
 // Helper to simulate GenLayer Web Crawl & Consensus Decision deterministically
@@ -301,62 +224,40 @@ function runGenLayerConsensusSimulation(
   title: string,
   description: string,
   category: string,
-  media_url: string,
-  parentTokenId: string | null = null
+  media_url: string
 ) {
-  // We'll generate dynamic scoring based on inputs to make it highly organic and interesting.
-  // Seed the generator slightly with length of string to be deterministic yet realistic.
   const seedVal = (title.length + description.length + category.length) % 30;
-  
-  // Base Originality calculation
   let baseOriginality = 82 + (seedVal % 15); // ranges 82 to 96
   
-  // Let's create realistic plagiarisms if user enters specific keywords
   const lowercaseTitle = title.toLowerCase();
   const lowercaseDesc = description.toLowerCase();
   const isPlagiarized = lowercaseTitle.includes("copy") || lowercaseTitle.includes("plagiarized") || lowercaseDesc.includes("stolen") || lowercaseDesc.includes("replica");
-  const isSuspicious = lowercaseTitle.includes("remix") && !parentTokenId || lowercaseDesc.includes("similar") || lowercaseTitle.includes("test-suspicious");
 
   if (isPlagiarized) {
     baseOriginality = 25 + (seedVal % 10); // Reject threshold
-  } else if (isSuspicious) {
-    baseOriginality = 55 + (seedVal % 10); // Probable original
   }
 
-  // If derivative, similarity score
-  let similarityScore: number | null = null;
-  if (parentTokenId) {
-    // Determine similarity from keywords
-    similarityScore = 40 + (seedVal % 45); // 40% to 85% similarity
-    if (lowercaseTitle.includes("identical") || lowercaseDesc.includes("exact copy")) {
-      similarityScore = 95; // Reject threshold for similarity
-    } else if (lowercaseTitle.includes("very different")) {
-      similarityScore = 25; // Treat as independent original
-    }
-  }
-
-  // Formulate 3 mock validator reviews with detailed rationales
   const validators: ValidatorReport[] = [
     {
       name: "Scholar AI",
       role: "Prior Art Crawler",
       decision: baseOriginality >= 40 ? 'APPROVED' : 'REJECTED',
       originalityScore: baseOriginality + 1,
-      similarityScore: similarityScore ? Math.min(100, similarityScore + 2) : null,
+      similarityScore: null,
       rationale: baseOriginality >= 40
-        ? `Crawl of scientific database indexes, OpenSea, and Rarible APIs showed no pre-existing match for this submission. Plagiarism index is clean under ${category}.`
-        : `CRITICAL MATCH FOUND: Detected high textual/structural correlation (84%) with on-chain metadata records published on an EVM chain in 2024. Non-original content.`,
-      evidenceFound: baseOriginality >= 40 ? [] : [{ url: "https://opensea.io/assets/plagiarized-record-2024", description: "Direct visual & description overlap detected on OpenSea static cache." }]
+        ? `Crawl of scientific database indexes, OpenSea, and Rarible APIs showed no pre-existing match for this submission.`
+        : `CRITICAL MATCH FOUND: Detected high textual/structural correlation (84%) with pre-existing resources.`,
+      evidenceFound: baseOriginality >= 40 ? [] : [{ url: "https://opensea.io/assets/plagiarized-record", description: "Direct similarity overlap discovered in static cache." }]
     },
     {
       name: "Legal Counsel AI",
       role: "Jurisdiction & IP Audit",
       decision: baseOriginality >= 40 ? 'APPROVED' : 'REJECTED',
       originalityScore: baseOriginality - 1,
-      similarityScore: similarityScore ? Math.max(0, similarityScore - 3) : null,
+      similarityScore: null,
       rationale: baseOriginality >= 40
-        ? `No statutory blocks found under USPTO or WIPO guidelines. The claim architecture is clear and unique. Verified for tokenization.`
-        : `Rejection recommended. The core claims are identical to existing foundational assets. Minting would violate anti-plagiarism guidelines.`,
+        ? `No statutory blocks found. The claim architecture is clear and satisfies standard requirements.`
+        : `Rejection recommended. The core claims are identical to pre-existing works.`,
       evidenceFound: []
     },
     {
@@ -364,23 +265,19 @@ function runGenLayerConsensusSimulation(
       role: "Style & Authenticity Auditor",
       decision: baseOriginality >= 40 ? 'APPROVED' : 'REJECTED',
       originalityScore: baseOriginality,
-      similarityScore: similarityScore,
+      similarityScore: null,
       rationale: baseOriginality >= 40
-        ? `Visual signature and description are cohesive. High technical quality with distinct characteristics.`
-        : `This asset is a direct duplicate of previously published works. No novelty found in style or content.`,
+        ? `Artistic signature and description are cohesive. High technical quality with distinct characteristics.`
+        : `This asset is a duplicate of previously published works. No novelty found.`,
       evidenceFound: []
     }
   ];
 
   const avgOriginality = Math.round((validators[0].originalityScore + validators[1].originalityScore + validators[2].originalityScore) / 3);
-  const avgSimilarity = similarityScore !== null
-    ? Math.round(((validators[0].similarityScore || 0) + (validators[1].similarityScore || 0) + (validators[2].similarityScore || 0)) / 3)
-    : null;
 
   return {
     validators,
     avgOriginality,
-    avgSimilarity,
     isOriginal: avgOriginality >= 40,
   };
 }
@@ -424,9 +321,6 @@ app.post('/api/nfts/mint', (req, res) => {
     authenticity_score: simulation.avgOriginality,
     authenticity_status: status,
     similar_works_found: simulation.avgOriginality >= 85 ? [] : [{ url: "https://google.com/search?q=" + encodeURIComponent(title), description: "Closest matching semantic title patterns discovered." }],
-    parent_token_id: null,
-    derivative_similarity_score: null,
-    royalty_bps_to_parent: 0,
     audit_history: [
       {
         timestamp: new Date().toISOString(),
@@ -436,22 +330,10 @@ app.post('/api/nfts/mint', (req, res) => {
         triggered_by: "0xGP_Protocol_v1"
       }
     ],
-    challenge_history: [],
     validators: simulation.validators
   };
 
   nfts.unshift(newNFT);
-
-  // Overpay refund simulation
-  const sent = parseFloat(fee_sent || "0.1");
-  const required = 0.05;
-  if (sent > required) {
-    const refund = (sent - required).toFixed(3);
-    pendingWithdrawals[creator] = (parseFloat(pendingWithdrawals[creator] || "0.0") + parseFloat(refund)).toFixed(3);
-    addLog("MINT_NFT", `Excess fee of ${refund} GETH routed to pending withdrawals for ${creator}`, 'SUCCESS');
-  }
-
-  contractTreasury = (parseFloat(contractTreasury) + required).toFixed(3);
 
   addLog("MINT_NFT", `NFT Minted Successfully! Token ID: ${tokenId} | Status: ${status} | Score: ${simulation.avgOriginality}`, 'SUCCESS');
 
@@ -462,90 +344,7 @@ app.post('/api/nfts/mint', (req, res) => {
   });
 });
 
-// 2. MINT DERIVATIVE
-app.post('/api/nfts/mint-derivative', (req, res) => {
-  const { parent_token_id, title, description, media_url, creator, fee_sent } = req.body;
-  if (!parent_token_id || !title || !description || !media_url || !creator) {
-    return res.status(400).json({ error: "Missing required derivative mint parameters." });
-  }
-
-  const parentNFT = nfts.find(n => n.token_id === parent_token_id);
-  if (!parentNFT) {
-    return res.status(400).json({ error: "Parent NFT not found on-chain." });
-  }
-
-  addLog("MINT_DERIVATIVE", `Evaluating remix lineage against parent NFT #${parent_token_id}`, 'INFO');
-
-  const simulation = runGenLayerConsensusSimulation(title, description, parentNFT.category, media_url, parent_token_id);
-
-  const avgSimilarity = simulation.avgSimilarity || 50;
-
-  // 1. similarity >= 90 -> Treat as duplicate, reject
-  if (avgSimilarity >= 90) {
-    addLog("MINT_DERIVATIVE", `Mint REJECTED for "${title}": Duplicate likeness to parent (Similarity: ${avgSimilarity}%). Fee refunded.`, 'ERROR');
-    return res.json({
-      success: false,
-      status: "REJECTED",
-      reason: `Proposed derivative is too similar to the parent NFT. Plagiarism threshold (90%) exceeded. Detected ${avgSimilarity}% likeness.`
-    });
-  }
-
-  // 2. similarity < 30 -> Independent
-  const isIndependent = avgSimilarity < 30;
-  const tokenId = (nextTokenId++).toString();
-  const royaltyBps = isIndependent ? 0 : Math.round(avgSimilarity * 10); // e.g. 50% similarity -> 500 bps (5%)
-  const status = simulation.avgOriginality >= 85 ? "VERIFIED_ORIGINAL" : "PROBABLE_ORIGINAL";
-
-  const newNFT: NFT_Record = {
-    token_id: tokenId,
-    creator,
-    owner: creator,
-    title,
-    description,
-    media_url,
-    category: parentNFT.category,
-    minted_at: new Date().toISOString(),
-    authenticity_score: simulation.avgOriginality,
-    authenticity_status: status,
-    similar_works_found: [],
-    parent_token_id: isIndependent ? null : parent_token_id,
-    derivative_similarity_score: isIndependent ? null : avgSimilarity,
-    royalty_bps_to_parent: royaltyBps,
-    audit_history: [
-      {
-        timestamp: new Date().toISOString(),
-        score_before: simulation.avgOriginality,
-        score_after: simulation.avgOriginality,
-        findings: isIndependent
-          ? `GenLayer evaluated claims: Determined work is structurally independent of Parent NFT #${parent_token_id} (Similarity: ${avgSimilarity}% < 30%). Minted as standalone.`
-          : `GenLayer Remix authorization: Minted as legitimate derivative of NFT #${parent_token_id}. Locked ${royaltyBps / 100}% royalty share directly to parent creator ${parentNFT.creator}.`,
-        triggered_by: "0xGP_Protocol_v1"
-      }
-    ],
-    challenge_history: [],
-    validators: simulation.validators
-  };
-
-  nfts.unshift(newNFT);
-
-  const sent = parseFloat(fee_sent || "0.1");
-  const required = 0.05;
-  if (sent > required) {
-    const refund = (sent - required).toFixed(3);
-    pendingWithdrawals[creator] = (parseFloat(pendingWithdrawals[creator] || "0.0") + parseFloat(refund)).toFixed(3);
-  }
-  contractTreasury = (parseFloat(contractTreasury) + required).toFixed(3);
-
-  addLog("MINT_DERIVATIVE", `Derivative NFT #${tokenId} minted. Similarity: ${avgSimilarity}% | Royalty: ${royaltyBps / 100}%`, 'SUCCESS');
-
-  res.json({
-    success: true,
-    token_id: tokenId,
-    nft: newNFT
-  });
-});
-
-// 3. AUDIT PROVENANCE
+// 2. AUDIT PROVENANCE
 app.post('/api/nfts/audit', (req, res) => {
   const { token_id, caller } = req.body;
   if (!token_id) {
@@ -560,7 +359,6 @@ app.post('/api/nfts/audit', (req, res) => {
   addLog("AUDIT_PROVENANCE", `Re-evaluating web registry footprint for NFT #${token_id}`, 'INFO');
 
   // Simulate a fresh search
-  // Random score fluctuate slightly, decay formula: round(old_score * 0.7 + fresh_score * 0.3)
   const isBadAudit = Math.random() > 0.85 || nft.title.toLowerCase().includes("decay") || nft.description.toLowerCase().includes("decay");
   const freshScore = isBadAudit ? Math.floor(20 + Math.random() * 20) : Math.floor(88 + Math.random() * 12);
   const oldScore = nft.authenticity_score;
@@ -572,7 +370,7 @@ app.post('/api/nfts/audit', (req, res) => {
 
   if (decayedScore < 40) {
     finalStatus = "DISPUTED";
-    findings = `CRITICAL ALERT: Audit score dropped below threshold (Score: ${decayedScore}). High correlation of copycat activities detected on social feeds.`;
+    findings = `CRITICAL ALERT: Audit score dropped below threshold (Score: ${decayedScore}). High correlation of copycat activities detected.`;
     addLog("AUDIT_PROVENANCE", `WARNING: NFT #${token_id} score dropped below 40. Down-graded to DISPUTED!`, 'WARNING');
   } else if (decayedScore >= 85) {
     finalStatus = "VERIFIED_ORIGINAL";
@@ -599,85 +397,7 @@ app.post('/api/nfts/audit', (req, res) => {
   });
 });
 
-// 4. CHALLENGE AUTHENTICITY
-app.post('/api/nfts/challenge', (req, res) => {
-  const { token_id, challenger, evidence_url, explanation } = req.body;
-  if (!token_id || !challenger || !explanation) {
-    return res.status(400).json({ error: "Missing required challenge parameters." });
-  }
-
-  const nft = nfts.find(n => n.token_id === token_id);
-  if (!nft) {
-    return res.status(404).json({ error: "NFT not found" });
-  }
-
-  addLog("CHALLENGE_AUTHENTICITY", `Active dispute submitted by ${challenger} against NFT #${token_id}`, 'WARNING');
-
-  // Determine outcome based on user-typed explanation
-  // If user writes "proof", "steal", "plagiarize", "stolen" or "revoke" -> Revoke!
-  const lowerExp = explanation.toLowerCase();
-  const lowerUrl = (evidence_url || "").toLowerCase();
-  let outcome: 'UPHELD' | 'DISPUTED' | 'REVOKED' = 'DISPUTED';
-  let scorePenal = 30;
-
-  if (lowerExp.includes("revoke") || lowerExp.includes("stolen") || lowerExp.includes("stole") || lowerUrl.includes("revoke")) {
-    outcome = "REVOKED";
-    scorePenal = 90;
-  } else if (lowerExp.includes("weak") || lowerExp.includes("dismiss") || lowerExp.includes("unfounded")) {
-    outcome = "UPHELD"; // Challenge lacks merit
-    scorePenal = 0;
-  }
-
-  const oldScore = nft.authenticity_score;
-  const newScore = Math.max(0, oldScore - scorePenal);
-  let finalStatus = nft.authenticity_status;
-
-  let resolution = "";
-  if (outcome === "REVOKED") {
-    finalStatus = "REVOKED";
-    resolution = `Challenge UPHELD with maximum confidence. Clear prior art verified at ${evidence_url || "provided citation"}. NFT #${token_id} permanently stripped of its authenticity certificate. Marketplace listing banned.`;
-    addLog("CHALLENGE_AUTHENTICITY", `CRITICAL: NFT #${token_id} has been permanently REVOKED due to verified plagiarism!`, 'ERROR');
-  } else if (outcome === "DISPUTED") {
-    finalStatus = "DISPUTED";
-    resolution = `Challenge has some technical merit. Correlation confirmed but copyright boundary is ambiguous. Status set to DISPUTED. Authenticity score penalized to ${newScore}.`;
-    addLog("CHALLENGE_AUTHENTICITY", `NFT #${token_id} status updated to DISPUTED. Score reduced.`, 'WARNING');
-  } else {
-    resolution = `Challenge dismissed as unsubstantiated. Evidence at ${evidence_url || "URL"} did not match the claim. Authenticity remains verified.`;
-    addLog("CHALLENGE_AUTHENTICITY", `Challenge against NFT #${token_id} dismissed. Status preserved.`, 'SUCCESS');
-  }
-
-  nft.authenticity_score = newScore;
-  nft.authenticity_status = finalStatus;
-
-  const challengeEntry: ChallengeHistoryEntry = {
-    challenger,
-    evidence_url: evidence_url || "",
-    explanation,
-    timestamp: new Date().toISOString(),
-    status: outcome,
-    resolution
-  };
-
-  nft.challenge_history.push(challengeEntry);
-
-  // If revoked, deactivate any active marketplace listing
-  if (finalStatus === "REVOKED") {
-    listings = listings.map(l => {
-      if (l.token_id === token_id) {
-        return { ...l, active: false };
-      }
-      return l;
-    });
-  }
-
-  res.json({
-    success: true,
-    nft,
-    challengeEntry
-  });
-});
-
-// 5. TRANSFER NFT
+// 3. TRANSFER NFT
 app.post('/api/nfts/transfer', (req, res) => {
   const { token_id, to, caller } = req.body;
   if (!token_id || !to || !caller) {
@@ -694,198 +414,10 @@ app.post('/api/nfts/transfer', (req, res) => {
   }
 
   nft.owner = to;
-  // Deactivate listing if any
-  listings = listings.map(l => {
-    if (l.token_id === token_id) return { ...l, active: false };
-    return l;
-  });
 
   addLog("TRANSFER_NFT", `NFT #${token_id} manually transferred from ${caller} to ${to}. Creator/provenance history preserved.`, 'SUCCESS');
 
   res.json({ success: true, nft });
-});
-
-// 6. MARKETPLACE: LIST
-app.post('/api/marketplace/list', (req, res) => {
-  const { token_id, price, seller } = req.body;
-  if (!token_id || !price || !seller) {
-    return res.status(400).json({ error: "Missing parameters." });
-  }
-
-  const nft = nfts.find(n => n.token_id === token_id);
-  if (!nft) {
-    return res.status(404).json({ error: "NFT not found" });
-  }
-
-  if (nft.owner.toLowerCase() !== seller.toLowerCase()) {
-    return res.status(403).json({ error: "Caller does not own this NFT" });
-  }
-
-  if (nft.authenticity_status === "REVOKED") {
-    return res.status(400).json({ error: "REVOKED NFTs are banned from the exclusive marketplace." });
-  }
-
-  // Remove existing listing if any
-  listings = listings.filter(l => l.token_id !== token_id);
-
-  const newListing: Listing = {
-    token_id,
-    seller,
-    price: parseFloat(price).toFixed(3),
-    listed_at: new Date().toISOString(),
-    active: true
-  };
-
-  listings.unshift(newListing);
-
-  addLog("MARKETPLACE_LIST", `NFT #${token_id} listed for sale at ${price} GETH by ${seller}`, 'SUCCESS');
-
-  res.json({ success: true, listing: newListing });
-});
-
-// 7. MARKETPLACE: CANCEL
-app.post('/api/marketplace/cancel', (req, res) => {
-  const { token_id, seller } = req.body;
-  if (!token_id || !seller) {
-    return res.status(400).json({ error: "Missing parameters." });
-  }
-
-  const listing = listings.find(l => l.token_id === token_id && l.active);
-  if (!listing) {
-    return res.status(404).json({ error: "Active listing not found" });
-  }
-
-  if (listing.seller.toLowerCase() !== seller.toLowerCase()) {
-    return res.status(403).json({ error: "Caller is not the seller" });
-  }
-
-  listing.active = false;
-  addLog("MARKETPLACE_CANCEL", `Listing for NFT #${token_id} cancelled by seller`, 'INFO');
-
-  res.json({ success: true });
-});
-
-// 8. MARKETPLACE: BUY
-app.post('/api/marketplace/buy', (req, res) => {
-  const { token_id, buyer, amount_sent } = req.body;
-  if (!token_id || !buyer || !amount_sent) {
-    return res.status(400).json({ error: "Missing buy parameters." });
-  }
-
-  const listing = listings.find(l => l.token_id === token_id && l.active);
-  if (!listing) {
-    return res.status(404).json({ error: "Listing is inactive or does not exist." });
-  }
-
-  const nft = nfts.find(n => n.token_id === token_id);
-  if (!nft) {
-    return res.status(404).json({ error: "NFT not found" });
-  }
-
-  const priceVal = parseFloat(listing.price);
-  const sentVal = parseFloat(amount_sent);
-
-  if (sentVal < priceVal) {
-    return res.status(400).json({ error: `Insufficient funds sent. Required: ${priceVal} GETH` });
-  }
-
-  // Deactivate listing
-  listing.active = false;
-
-  // Compute splits
-  // 1. Protocol Fee (2.5%)
-  const protocolFeeBps = 250;
-  const feeShare = (priceVal * protocolFeeBps) / 10000;
-  contractTreasury = (parseFloat(contractTreasury) + feeShare).toFixed(3);
-
-  // 2. Lineage Royalty Bps check (if derivative)
-  let royaltyShare = 0;
-  let parentCreator = "";
-  if (nft.parent_token_id && nft.royalty_bps_to_parent > 0) {
-    const parentNFT = nfts.find(p => p.token_id === nft.parent_token_id);
-    if (parentNFT) {
-      parentCreator = parentNFT.creator;
-      royaltyShare = (priceVal * nft.royalty_bps_to_parent) / 10000;
-      pendingWithdrawals[parentCreator] = (parseFloat(pendingWithdrawals[parentCreator] || "0.0") + royaltyShare).toFixed(3);
-    }
-  }
-
-  // 3. Remainder goes to seller
-  const sellerProceeds = priceVal - feeShare - royaltyShare;
-  const seller = listing.seller;
-  pendingWithdrawals[seller] = (parseFloat(pendingWithdrawals[seller] || "0.0") + sellerProceeds).toFixed(3);
-
-  // 4. Overpay refund goes to buyer
-  const overpay = sentVal - priceVal;
-  if (overpay > 0) {
-    pendingWithdrawals[buyer] = (parseFloat(pendingWithdrawals[buyer] || "0.0") + overpay).toFixed(3);
-  }
-
-  // Transfer Ownership
-  const oldOwner = nft.owner;
-  nft.owner = buyer;
-
-  addLog("MARKETPLACE_BUY", `SOLD! NFT #${token_id} bought by ${buyer}. Price: ${priceVal} GETH. Fee: ${feeShare.toFixed(3)}, Royalty: ${royaltyShare.toFixed(3)} to ${parentCreator || "none"}, Proceeds: ${sellerProceeds.toFixed(3)} to ${seller}`, 'SUCCESS');
-
-  res.json({
-    success: true,
-    nft,
-    splits: {
-      price: priceVal,
-      fee: feeShare,
-      royalty: royaltyShare,
-      seller_proceeds: sellerProceeds,
-      refund: overpay
-    }
-  });
-});
-
-// Proxy to fetch real-time GenLayer Studio testnet status safely without CORS issues
-app.get('/api/genlayer-live-info', async (req, res) => {
-  try {
-    const response = await fetch('https://studio.genlayer.com/api', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'eth_blockNumber',
-        params: [],
-        id: 1
-      })
-    });
-    const data = (await response.json()) as any;
-    const blockNumberHex = data?.result || '0x0';
-    const blockNumberDecimal = parseInt(blockNumberHex, 16);
-
-    const chainResponse = await fetch('https://studio.genlayer.com/api', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'eth_chainId',
-        params: [],
-        id: 1
-      })
-    });
-    const chainData = (await chainResponse.json()) as any;
-    const chainIdHex = chainData?.result || '0xf22f';
-    const chainIdDecimal = parseInt(chainIdHex, 16);
-
-    res.json({
-      status: 'connected',
-      block_height: blockNumberDecimal > 0 ? blockNumberDecimal : 842921,
-      chain_id: chainIdDecimal > 0 ? chainIdDecimal : 61999,
-      rpc_url: 'https://studio.genlayer.com/api'
-    });
-  } catch (err: any) {
-    res.json({
-      status: 'offline',
-      block_height: 842910,
-      chain_id: 61999,
-      rpc_url: 'https://studio.genlayer.com/api',
-      error: err.message
-    });
-  }
 });
 
 async function startServer() {

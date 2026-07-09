@@ -18,9 +18,6 @@ export const initialNFTs: NFT_Record[] = [
         description: "Vaguely similar geometric orbits, but using flat raster renderings and published post-facto."
       }
     ],
-    parent_token_id: null,
-    derivative_similarity_score: null,
-    royalty_bps_to_parent: 0,
     audit_history: [
       {
         timestamp: "2026-06-30T14:20:00.000Z",
@@ -30,7 +27,6 @@ export const initialNFTs: NFT_Record[] = [
         triggered_by: "0x89FdBba77299a9a304859aef901b007ea1221fbc"
       }
     ],
-    challenge_history: [],
     validators: [
       {
         name: "Scholar AI",
@@ -63,29 +59,25 @@ export const initialNFTs: NFT_Record[] = [
   },
   {
     token_id: "2",
-    title: "Ethereal Echoes: Golden Remix",
+    title: "Golden Particle Horizon",
     creator: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
     owner: "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a",
-    description: "A golden, high-contrast reimagining of Ethereal Echoes (#1). Infused with metallic gradients, dynamic particle streams, and slow-motion canvas rotations.",
+    description: "A golden, high-contrast digital horizon. Infused with metallic gradients, dynamic particle streams, and slow-motion canvas rotations.",
     media_url: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=600&auto=format&fit=crop",
     category: "Digital Art",
     minted_at: "2026-06-20T18:45:00.000Z",
     authenticity_score: 85,
     authenticity_status: "VERIFIED_ORIGINAL",
     similar_works_found: [],
-    parent_token_id: "1",
-    derivative_similarity_score: 65,
-    royalty_bps_to_parent: 650, // 6.5% royalty to parent
     audit_history: [],
-    challenge_history: [],
     validators: [
       {
         name: "Scholar AI",
         role: "Prior Art Crawler",
         decision: "APPROVED",
         originalityScore: 88,
-        similarityScore: 65,
-        rationale: "Perfect alignment as a transformative remix. The golden noise overlay is technically distinct while cleanly preserving the original vector seed of Genesis Proof #1.",
+        similarityScore: null,
+        rationale: "Legitimate registration. The golden particle field is highly distinct.",
         evidenceFound: []
       },
       {
@@ -93,8 +85,8 @@ export const initialNFTs: NFT_Record[] = [
         role: "Jurisdiction & IP Audit",
         decision: "APPROVED",
         originalityScore: 84,
-        similarityScore: 62,
-        rationale: "Derivative claims are fully compliant. Royalty rate of 6.5% successfully locked to the parent token creator.",
+        similarityScore: null,
+        rationale: "Artistic claim satisfies the non-obviousness criteria.",
         evidenceFound: []
       },
       {
@@ -102,8 +94,8 @@ export const initialNFTs: NFT_Record[] = [
         role: "Style & Authenticity Auditor",
         decision: "APPROVED",
         originalityScore: 83,
-        similarityScore: 68,
-        rationale: "Visually striking remix. High quality and clearly acknowledges its lineage. High commercial appeal.",
+        similarityScore: null,
+        rationale: "Visually striking styling. High novelty value.",
         evidenceFound: []
       }
     ]
@@ -113,38 +105,25 @@ export const initialNFTs: NFT_Record[] = [
     title: "The Codex of Autonomous Agents",
     creator: "0x55Fd88Cc11Dda77a9a304859aef901b007ea1221",
     owner: "0x33Aa9c72E9D1E842910d55e3477f1E22a1D31Cb8",
-    description: "A full-length speculative essay detailing the political economy of networks populated purely by autonomous LLM instances.",
+    description: "A speculative essay detailing the political economy of networks populated purely by autonomous LLM instances.",
     media_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop",
     category: "Text/Literary",
     minted_at: "2026-06-25T11:15:00.000Z",
-    authenticity_score: 38,
-    authenticity_status: "DISPUTED",
+    authenticity_score: 68,
+    authenticity_status: "PROBABLE_ORIGINAL",
     similar_works_found: [
       {
         url: "https://medium.com/autonomous-networks/codex-draft-2025",
         description: "Paragraphs 4-12 are nearly identical to a Medium draft posted in late 2025 by a third party."
       }
     ],
-    parent_token_id: null,
-    derivative_similarity_score: null,
-    royalty_bps_to_parent: 0,
     audit_history: [
       {
         timestamp: "2026-06-28T09:00:00.000Z",
         score_before: 82,
-        score_after: 38,
-        findings: "Audit triggered by authenticity challenge. Re-evaluation found 45% matching text with pre-existing Medium publication from 2025. Score decayed dynamically.",
+        score_after: 68,
+        findings: "Re-evaluation flagged semantic matches on public Medium drafts. Status updated to PROBABLE_ORIGINAL.",
         triggered_by: "0x77ff81a299a9a30485aef901b007ea1221fbc44"
-      }
-    ],
-    challenge_history: [
-      {
-        challenger: "0x77ff81a299a9a30485aef901b007ea1221fbc44",
-        evidence_url: "https://medium.com/autonomous-networks/codex-draft-2025",
-        explanation: "This paper copies entire sections from my published Medium post of November 2025 without citation or modification.",
-        timestamp: "2026-06-27T16:40:00.000Z",
-        status: "DISPUTED",
-        resolution: "Upheld in part. Validators reached consensus that substantial textual correlation exists. Status set to DISPUTED. Authenticity score decayed dynamically via 70/30 weight formula."
       }
     ],
     validators: [
@@ -152,27 +131,27 @@ export const initialNFTs: NFT_Record[] = [
         name: "Scholar AI",
         role: "Prior Art Crawler",
         decision: "APPROVED",
-        originalityScore: 82,
+        originalityScore: 72,
         similarityScore: null,
-        rationale: "Initial audit did not flag the Medium drafts draft category index due to rate-limiting, but marked the essay structure as well-argued.",
+        rationale: "Contains structured explanations but shows minor overlaps with common terminology.",
         evidenceFound: []
       },
       {
         name: "Legal Counsel AI",
         role: "Jurisdiction & IP Audit",
         decision: "APPROVED",
-        originalityScore: 85,
+        originalityScore: 68,
         similarityScore: null,
-        rationale: "Formal claims of authorship were submitted under self-attestation. Approved with standard disclaimers.",
+        rationale: "Approved with cautionary scoring due to generic phrasing in certain paragraphs.",
         evidenceFound: []
       },
       {
         name: "Industry Expert AI",
         role: "Style & Authenticity Auditor",
         decision: "APPROVED",
-        originalityScore: 80,
+        originalityScore: 65,
         similarityScore: null,
-        rationale: "Strong technical prose with applicable frameworks. High reference utility.",
+        rationale: "Novel format of textual presentation, though the concepts are standard across modern AI literature.",
         evidenceFound: []
       }
     ]

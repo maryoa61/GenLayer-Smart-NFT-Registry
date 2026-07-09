@@ -6,15 +6,6 @@ export interface AuditHistoryEntry {
   triggered_by: string;
 }
 
-export interface ChallengeHistoryEntry {
-  challenger: string;
-  evidence_url: string;
-  explanation: string;
-  timestamp: string;
-  status: 'UPHELD' | 'DISPUTED' | 'REVOKED';
-  resolution: string;
-}
-
 export interface ValidatorReport {
   name: string;
   role: string;
@@ -35,26 +26,8 @@ export interface NFT_Record {
   category: string;
   minted_at: string;
   authenticity_score: number;
-  authenticity_status: 'VERIFIED_ORIGINAL' | 'PROBABLE_ORIGINAL' | 'UNVERIFIED' | 'DISPUTED' | 'REVOKED';
+  authenticity_status: 'VERIFIED_ORIGINAL' | 'PROBABLE_ORIGINAL' | 'UNVERIFIED' | 'DISPUTED';
   similar_works_found: { url: string; description: string }[];
-  parent_token_id: string | null;
-  derivative_similarity_score: number | null;
-  royalty_bps_to_parent: number;
   audit_history: AuditHistoryEntry[];
-  challenge_history: ChallengeHistoryEntry[];
   validators?: ValidatorReport[]; // Visual simulation metadata
-}
-
-export interface Listing {
-  token_id: string;
-  seller: string;
-  price: string; // in GETH / GLR
-  listed_at: string;
-  active: boolean;
-}
-
-export interface AccountBalance {
-  address: string;
-  balance: string; // GETH
-  pending_withdrawals: string; // for claim_proceeds
 }
