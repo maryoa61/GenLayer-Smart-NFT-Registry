@@ -4,7 +4,7 @@ import {
   Network, Plus, Search, Cpu, RefreshCw, Sparkles, Filter, 
   User, Terminal, HelpCircle, History, ClipboardList, CheckCircle, 
   Copy, ExternalLink, Check, Send, Coins, ShoppingBag, Layers, 
-  Settings, ArrowRight, ArrowDown, Shield, Info, CheckSquare
+  Settings, ArrowRight, ArrowDown, Shield, Info, CheckSquare, Wallet, XCircle
 } from 'lucide-react';
 import { NFT_Record } from './types';
 import SubmitPatentForm from './components/SubmitPatentForm';
@@ -28,6 +28,9 @@ export default function App() {
   ];
   
   const [currentWallet, setCurrentWallet] = useState(mockWallets[0]);
+  const [isWalletConnected, setIsWalletConnected] = useState(true);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [walletBalances, setWalletBalances] = useState<Record<string, number>>({
     "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd": 14.25,
     "0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a": 8.10,
@@ -490,35 +493,68 @@ export default function App() {
               <span>English (EN)</span>
             </div>
 
-            {/* Wallet Select */}
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-black border border-indigo-500/10 rounded-sm" dir="ltr">
-              <User className="w-3.5 h-3.5 text-indigo-400" />
-              <select
-                value={currentWallet.address}
-                onChange={(e) => {
-                  const found = mockWallets.find(w => w.address === e.target.value);
-                  if (found) {
-                    setCurrentWallet(found);
-                    addLogLocal("SWITCH_WALLET", `Switched active wallet context to ${found.name}`, "INFO");
-                  }
+            {/* Wallet Select / Connect Area */}
+            {!isWalletConnected ? (
+              <button
+                onClick={() => {
+                  setShowWalletModal(true);
                 }}
-                className="bg-transparent text-xs text-indigo-400 focus:outline-none cursor-pointer font-mono text-[11px]"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white text-[11px] font-mono font-bold rounded-sm shadow-md animate-pulse transition-all cursor-pointer border border-amber-400/30"
               >
-                {mockWallets.map(w => (
-                  <option key={w.address} value={w.address} className="bg-black text-indigo-400">
-                    {w.name} ({w.address.slice(0,6)}...{w.address.slice(-4)})
-                  </option>
-                ))}
-              </select>
-            </div>
+                <Wallet className="w-3.5 h-3.5 text-white" />
+                <span>{t.connectWalletBtn}</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Connected status pill */}
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono rounded-sm font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>{t.walletStatusConnected}</span>
+                </div>
 
-            {/* Balances Display */}
-            <div className="flex items-center gap-4 text-xs font-mono" dir="ltr">
-              <div>
-                <span className="text-[9px] text-indigo-600/70 uppercase block leading-none">{lang === 'fa' ? 'موجودی' : 'Balance'}</span>
-                <span className="text-indigo-400 font-bold">{(walletBalances[currentWallet.address] || 0).toFixed(2)} GETH</span>
+                {/* Wallet Select */}
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-black border border-indigo-500/25 rounded-sm" dir="ltr">
+                  <User className="w-3.5 h-3.5 text-indigo-400" />
+                  <select
+                    value={currentWallet.address}
+                    onChange={(e) => {
+                      const found = mockWallets.find(w => w.address === e.target.value);
+                      if (found) {
+                        setCurrentWallet(found);
+                        addLogLocal("SWITCH_WALLET", `Switched active wallet context to ${found.name}`, "INFO");
+                      }
+                    }}
+                    className="bg-transparent text-xs text-indigo-300 focus:outline-none cursor-pointer font-mono text-[11px]"
+                  >
+                    {mockWallets.map(w => (
+                      <option key={w.address} value={w.address} className="bg-black text-indigo-400">
+                        {w.name} ({w.address.slice(0,6)}...{w.address.slice(-4)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Balances Display */}
+                <div className="flex items-center gap-2 text-xs font-mono border-l border-indigo-500/20 pl-3.5" dir="ltr">
+                  <div>
+                    <span className="text-[9px] text-indigo-600/70 uppercase block leading-none">{lang === 'fa' ? 'موجودی' : 'Balance'}</span>
+                    <span className="text-indigo-400 font-bold">{(walletBalances[currentWallet.address] || 0).toFixed(2)} GETH</span>
+                  </div>
+                </div>
+
+                {/* Disconnect Button */}
+                <button
+                  onClick={() => {
+                    setIsWalletConnected(false);
+                    addLogLocal("WALLET_DISCONNECTED", "Web3 wallet context disconnected from the provider", "WARNING");
+                  }}
+                  title={t.disconnectBtn}
+                  className="p-1 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
               </div>
-            </div>
+            )}
           </div>
 
         </div>
@@ -770,6 +806,7 @@ export default function App() {
                   onCancel={() => setShowSubmitForm(false)}
                   onSuccess={handleRegisterSuccess}
                   lang={lang}
+                  connectedAddress={isWalletConnected ? currentWallet.address : undefined}
                 />
               </motion.div>
             ) : (
@@ -821,7 +858,14 @@ export default function App() {
                     </select>
 
                     <button
-                      onClick={() => setShowSubmitForm(true)}
+                      onClick={() => {
+                        if (!isWalletConnected) {
+                          addLogLocal("WALLET_REQUIRED", "Wallet connection is required to submit new asset registrations on GenLayer VM.", "WARNING");
+                          setShowWalletModal(true);
+                        } else {
+                          setShowSubmitForm(true);
+                        }
+                      }}
                       className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white active:scale-[0.98] transition-all rounded-sm text-xs font-bold uppercase tracking-widest cursor-pointer shadow-lg shadow-indigo-500/10 animate-pulse-slow"
                     >
                       <Plus className="w-4 h-4" /> {t.registerBtn}
@@ -975,7 +1019,14 @@ export default function App() {
                               </button>
 
                               <button
-                                onClick={() => handleAuditProvenance(nft.token_id)}
+                                onClick={() => {
+                                  if (!isWalletConnected) {
+                                    addLogLocal("WALLET_REQUIRED", "Wallet connection is required to re-audit assets on GenLayer VM.", "WARNING");
+                                    setShowWalletModal(true);
+                                  } else {
+                                    handleAuditProvenance(nft.token_id);
+                                  }
+                                }}
                                 className="flex flex-col items-center justify-center gap-0.5 px-3 py-1 bg-black hover:bg-indigo-500/5 text-indigo-400 border border-indigo-500/20 rounded-sm text-[9px] font-bold uppercase transition-all cursor-pointer disabled:opacity-50"
                                 disabled={isLoading || !!cooldownTimers[nft.token_id]}
                                 title="Re-run mathematical decay and crawler analysis (Contract 2)"
@@ -999,7 +1050,14 @@ export default function App() {
                               {isOwner ? (
                                 <div className="grid grid-cols-2 gap-1 col-span-1">
                                   <button
-                                    onClick={() => setNftToList(nft)}
+                                    onClick={() => {
+                                      if (!isWalletConnected) {
+                                        addLogLocal("WALLET_REQUIRED", "Wallet connection is required to list assets for sale.", "WARNING");
+                                        setShowWalletModal(true);
+                                      } else {
+                                        setNftToList(nft);
+                                      }
+                                    }}
                                     className="flex items-center justify-center gap-1 px-2 py-1.5 bg-emerald-950/20 hover:bg-emerald-900/30 text-emerald-400 border border-emerald-500/20 rounded-sm text-[9px] font-bold uppercase transition-all cursor-pointer"
                                     title="List this patent for sale on the marketplace (Contract 3)"
                                   >
@@ -1007,7 +1065,14 @@ export default function App() {
                                     {t.sellBtn}
                                   </button>
                                   <button
-                                    onClick={() => setNftToTransfer(nft)}
+                                    onClick={() => {
+                                      if (!isWalletConnected) {
+                                        addLogLocal("WALLET_REQUIRED", "Wallet connection is required to transfer asset ownership.", "WARNING");
+                                        setShowWalletModal(true);
+                                      } else {
+                                        setNftToTransfer(nft);
+                                      }
+                                    }}
                                     className="flex items-center justify-center gap-1 px-2 py-1.5 bg-indigo-950/20 hover:bg-indigo-950/30 text-indigo-400 border border-indigo-500/20 rounded-sm text-[9px] font-bold uppercase transition-all cursor-pointer"
                                     title="Manually transfer ownership address"
                                   >
@@ -1017,7 +1082,14 @@ export default function App() {
                                 </div>
                               ) : nft.is_listed ? (
                                 <button
-                                  onClick={() => handleBuyNft(nft)}
+                                  onClick={() => {
+                                    if (!isWalletConnected) {
+                                      addLogLocal("WALLET_REQUIRED", "Wallet connection is required to purchase assets from the marketplace.", "WARNING");
+                                      setShowWalletModal(true);
+                                    } else {
+                                      handleBuyNft(nft);
+                                    }
+                                  }}
                                   className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-black border border-emerald-500/30 rounded-sm text-[10px] font-bold uppercase transition-all cursor-pointer shadow-lg shadow-emerald-500/10"
                                   title="Purchase ownership with instant royalty payout split (Contract 3)"
                                 >
@@ -1225,6 +1297,164 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      {/* Web3 Wallet Connection Modal */}
+      {showWalletModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+          <div className="bg-black border border-indigo-500/35 rounded-2xl p-6 w-full max-w-md text-left space-y-5 shadow-[0_0_50px_rgba(99,102,241,0.2)] relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-3 text-[9px] font-mono text-indigo-500/30 uppercase">
+              Web3 secure handshake
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-serif italic text-indigo-400 text-lg flex items-center gap-2">
+                <Wallet className="w-5 h-5 text-indigo-400 animate-bounce" />
+                {t.walletModalTitle}
+              </h4>
+              <p className="text-xs text-indigo-500/80 leading-relaxed">
+                {t.walletModalDesc}
+              </p>
+            </div>
+
+            {isConnecting ? (
+              <div className="py-8 flex flex-col items-center justify-center space-y-4">
+                <Cpu className="w-8 h-8 text-amber-400 animate-spin" />
+                <div className="text-center space-y-1">
+                  <p className="text-xs font-mono text-amber-300 font-bold animate-pulse">
+                    {lang === 'fa' ? 'در حال برقراری ارتباط با افزونه کیف‌پول...' : 'Initializing connection protocol...'}
+                  </p>
+                  <p className="text-[10px] text-indigo-500/60 font-mono">
+                    glvm_connect(provider: "web3_injected", chainId: 101)
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 pt-2">
+                {/* Metamask Option */}
+                <button
+                  onClick={async () => {
+                    setIsConnecting(true);
+                    addLogLocal("CONNECTING_WALLET", "Requesting signature approval from MetaMask...", "INFO");
+                    
+                    if (typeof window !== 'undefined' && (window as any).ethereum) {
+                      try {
+                        const ethereum = (window as any).ethereum;
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        if (accounts && accounts.length > 0) {
+                          const userAddress = accounts[0];
+                          const userWallet = {
+                            address: userAddress,
+                            name: `MetaMask (${userAddress.slice(0, 6)}...${userAddress.slice(-4)})`
+                          };
+                          
+                          setCurrentWallet(userWallet);
+                          setIsWalletConnected(true);
+                          
+                          setWalletBalances(prev => ({
+                            ...prev,
+                            [userAddress]: prev[userAddress] || 15.40
+                          }));
+                          
+                          addLogLocal("WALLET_CONNECTED", `MetaMask connected securely: ${userAddress}`, "SUCCESS");
+                          setShowWalletModal(false);
+                        } else {
+                          throw new Error("No accounts authorized.");
+                        }
+                      } catch (err: any) {
+                        console.error(err);
+                        addLogLocal("CONNECT_ERROR", `MetaMask connection failed: ${err.message || err}`, "ERROR");
+                        // Fallback to simulator
+                        setIsWalletConnected(true);
+                        setShowWalletModal(false);
+                      } finally {
+                        setIsConnecting(false);
+                      }
+                    } else {
+                      // Fallback when not injected (e.g. Inside iframe sandbox or no metamask installed)
+                      await new Promise(r => setTimeout(r, 1600));
+                      setIsConnecting(false);
+                      setIsWalletConnected(true);
+                      setShowWalletModal(false);
+                      addLogLocal("WALLET_CONNECTED", `MetaMask simulator connected securely: ${currentWallet.address}`, "SUCCESS");
+                      addLogLocal("IFRAME_SANDBOX", "Iframe Sandbox or No Extension detected. Initialized simulator provider safely.", "WARNING");
+                    }
+                  }}
+                  className="flex items-center justify-between p-3.5 bg-indigo-950/10 border border-indigo-500/15 hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl transition-all duration-200 text-left group cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🦊</span>
+                    <div>
+                      <h5 className="text-xs font-mono font-bold text-indigo-300 group-hover:text-white transition-colors">MetaMask</h5>
+                      <p className="text-[10px] text-indigo-500/70">Injected Web3 Browser Extension</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-indigo-500 font-mono border border-indigo-500/20 px-2 py-0.5 rounded-sm uppercase tracking-wider group-hover:border-indigo-400/50 group-hover:text-indigo-300">DETECTED</span>
+                </button>
+
+                {/* GenLayer Native Option */}
+                <button
+                  onClick={async () => {
+                    setIsConnecting(true);
+                    addLogLocal("CONNECTING_WALLET", "Requesting secure handshake with GenLayer Wallet...", "INFO");
+                    await new Promise(r => setTimeout(r, 1800));
+                    setIsConnecting(false);
+                    setIsWalletConnected(true);
+                    setShowWalletModal(false);
+                    addLogLocal("WALLET_CONNECTED", `GenLayer Wallet connected securely: ${currentWallet.address}`, "SUCCESS");
+                  }}
+                  className="flex items-center justify-between p-3.5 bg-gradient-to-r from-indigo-950/20 to-black border border-indigo-500/30 hover:border-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-200 text-left group cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-1 bg-indigo-500/10 rounded-sm border border-indigo-500/20">
+                      <Network className="w-5 h-5 text-indigo-400" />
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-mono font-bold text-indigo-300 group-hover:text-white transition-colors">GenLayer Wallet</h5>
+                      <p className="text-[10px] text-indigo-500/70">Native Multi-Agent Smart Client</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-mono border border-emerald-500/20 px-2 py-0.5 bg-emerald-500/5 rounded-sm uppercase tracking-wider">RECOMMENDED</span>
+                </button>
+
+                {/* WalletConnect Option */}
+                <button
+                  onClick={async () => {
+                    setIsConnecting(true);
+                    addLogLocal("CONNECTING_WALLET", "Polling QR handshake on WalletConnect bridge...", "INFO");
+                    await new Promise(r => setTimeout(r, 1500));
+                    setIsConnecting(false);
+                    setIsWalletConnected(true);
+                    setShowWalletModal(false);
+                    addLogLocal("WALLET_CONNECTED", `WalletConnect session established: ${currentWallet.address}`, "SUCCESS");
+                  }}
+                  className="flex items-center justify-between p-3.5 bg-indigo-950/10 border border-indigo-500/15 hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl transition-all duration-200 text-left group cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🔗</span>
+                    <div>
+                      <h5 className="text-xs font-mono font-bold text-indigo-300 group-hover:text-white transition-colors">WalletConnect</h5>
+                      <p className="text-[10px] text-indigo-500/70">Connect with Mobile App & Scan QR</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-indigo-500 font-mono border border-indigo-500/10 px-2 py-0.5 rounded-sm uppercase tracking-wider group-hover:border-indigo-400/50">BRIDGE</span>
+                </button>
+              </div>
+            )}
+
+            <div className="flex justify-end pt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowWalletModal(false);
+                }}
+                className="px-4 py-2 bg-indigo-500/5 hover:bg-indigo-500/15 text-indigo-400 border border-indigo-500/20 text-xs font-bold uppercase cursor-pointer rounded-sm transition-colors"
+              >
+                {t.cancelBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Humble aesthetic footer */}
       <footer className="mt-12 border-t border-indigo-500/15 py-6 px-6 text-center text-indigo-600/55 font-mono text-[10px] space-y-1 bg-black">

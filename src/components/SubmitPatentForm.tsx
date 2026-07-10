@@ -5,18 +5,25 @@ interface SubmitPatentFormProps {
   onCancel: () => void;
   onSuccess: (newNft: any) => void;
   lang: 'fa' | 'en';
+  connectedAddress?: string;
 }
 
-export default function SubmitPatentForm({ onCancel, onSuccess, lang }: SubmitPatentFormProps) {
+export default function SubmitPatentForm({ onCancel, onSuccess, lang, connectedAddress }: SubmitPatentFormProps) {
   const [formData, setFormData] = useState({
     title: '',
-    creator: '',
+    creator: connectedAddress || '',
     category: 'Digital Art',
     description: '',
     mediaUrl: '',
     feeSent: '0.05', // required fee is 0.05
     royaltyPercentage: '10' // default royalty is 10%
   });
+
+  React.useEffect(() => {
+    if (connectedAddress) {
+      setFormData(prev => ({ ...prev, creator: connectedAddress }));
+    }
+  }, [connectedAddress]);
 
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -132,16 +139,28 @@ export default function SubmitPatentForm({ onCancel, onSuccess, lang }: SubmitPa
                 <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 text-left">
                   {lang === 'fa' ? 'آدرس فرستنده / مینت‌کننده *' : 'Creator Address (Minter Address) *'}
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.creator}
-                  onChange={(e) => setFormData({ ...formData, creator: e.target.value })}
-                  placeholder="e.g. 0x4A7b99c72E9D1E842910d55e3477f1E22a..."
-                  className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all font-mono text-left"
-                  id="input-creator"
-                  dir="ltr"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={formData.creator}
+                    onChange={(e) => setFormData({ ...formData, creator: e.target.value })}
+                    readOnly={!!connectedAddress}
+                    placeholder="e.g. 0x4A7b99c72E9D1E842910d55e3477f1E22a..."
+                    className={`w-full px-4 py-2.5 bg-black border ${
+                      connectedAddress 
+                        ? 'border-indigo-500/40 text-emerald-300 font-extrabold cursor-not-allowed bg-emerald-500/[0.02]' 
+                        : 'border-indigo-500/25 text-indigo-400 focus:border-indigo-400'
+                    } rounded-sm text-xs placeholder-indigo-800/60 focus:outline-none transition-all font-mono text-left`}
+                    id="input-creator"
+                    dir="ltr"
+                  />
+                  {connectedAddress && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-emerald-400 font-mono font-bold uppercase tracking-widest">
+                      🔒 SECURE WALLET
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Title */}

@@ -68,6 +68,12 @@ export interface TranslationSet {
   contract1Desc: string;
   contract2Desc: string;
   contract3Desc: string;
+  connectWalletBtn: string;
+  disconnectBtn: string;
+  walletModalTitle: string;
+  walletModalDesc: string;
+  walletStatusConnected: string;
+  walletStatusDisconnected: string;
 }
 
 const englishTranslation: TranslationSet = {
@@ -139,7 +145,13 @@ const englishTranslation: TranslationSet = {
   adminSectionTitle: "PROJECT MANAGEMENT & PARAMETER TUNING",
   contract1Desc: "Secures original authorship metadata. It is highly optimized to protect basic mint variables and prevents storage/memory overhead during registration.",
   contract2Desc: "Calculates the mathematical scoring algorithms. Because this logic is isolated, you can change the formula weight below instantly without touching your NFT registry!",
-  contract3Desc: "Processes listings, purchases, and manages royalty transfers. High financial processing volumes are completely sandboxed here, saving protocol resources."
+  contract3Desc: "Processes listings, purchases, and manages royalty transfers. High financial processing volumes are completely sandboxed here, saving protocol resources.",
+  connectWalletBtn: "Connect Web3 Wallet",
+  disconnectBtn: "Disconnect Wallet",
+  walletModalTitle: "Connect Web3 Wallet",
+  walletModalDesc: "Select your preferred Web3 provider to interact with GenLayer Smart Contracts.",
+  walletStatusConnected: "Wallet Connected",
+  walletStatusDisconnected: "Wallet Disconnected"
 };
 
 export const translations: Record<'en' | 'fa', TranslationSet> = {
