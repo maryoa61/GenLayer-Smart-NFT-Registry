@@ -1,20 +1,28 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Genesis Proof 🧬
+**The Decentralized Patent Protocol on GenLayer VM.**
 
-# Run and deploy your AI Studio app
+Genesis Proof is a high-performance, modular dApp designed to bridge the gap between AI-driven patent verification and secure blockchain asset management. Built for speed, optimized for mobile.
 
-This contains everything you need to run your app locally.
+## 🚀 Key Features
+- **Optimistic UI Engine:** Zero-latency interaction. Instant local state updates with background blockchain synchronization.
+- **AI-Oracle Integration:** Real-time patent authenticity scoring via crawler nodes.
+- **Modular Architecture:** Decoupled contracts (Registry, Audit, Market) for seamless upgrades.
+- **Cache-Aside Pattern:** Optimized RPC performance by serving metadata from local storage.
+- **Anti-Spam:** Smart cooldowns and gas-throttling.
 
-View your app in AI Studio: https://ai.studio/apps/d917849c-120a-4d91-8e4d-619377800747
+## 🛠 Tech Stack
+- **Client:** Kotlin (Jetpack Compose) / Web-based WebView.
+- **Blockchain:** GenLayer VM (Registry, Audit, Market Contracts).
+- **Architecture:** MVVM Pattern with async parallel coroutines.
 
-## Run Locally
+## 📖 User Guide
+1. Connect wallet.
+2. Mint a patent entry.
+3. Trigger "Re-Audit" for authenticity.
+4. List on Market for instant trading.
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🗺 Roadmap
+- [x] Core Protocol Deployment.
+- [x] Optimistic UI & Caching Engine.
+- [ ] AI Consensus expansion.
+- [ ] Cross-chain integration.
