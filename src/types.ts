@@ -30,4 +30,7 @@ export interface NFT_Record {
   similar_works_found: { url: string; description: string }[];
   audit_history: AuditHistoryEntry[];
   validators?: ValidatorReport[]; // Visual simulation metadata
+  price?: number;
+  is_listed?: boolean;
+  royalty_percentage?: number;
 }

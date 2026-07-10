@@ -6,9 +6,10 @@ import { BookOpen, Scale, Network, CheckCircle, XCircle, Search, Cpu, Code, Copy
 interface ConsensusVisualizerProps {
   nft: NFT_Record;
   onClose: () => void;
+  lang: 'fa' | 'en';
 }
 
-export default function ConsensusVisualizer({ nft, onClose }: ConsensusVisualizerProps) {
+export default function ConsensusVisualizer({ nft, onClose, lang }: ConsensusVisualizerProps) {
   const [activeTab, setActiveTab] = useState<'validators' | 'code'>('validators');
   const [copied, setCopied] = useState(false);
 
@@ -179,7 +180,7 @@ class GenesisProof(gl.Contract):
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" dir={lang === 'fa' ? 'rtl' : 'ltr'}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -189,18 +190,20 @@ class GenesisProof(gl.Contract):
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-500/20 bg-black">
-          <div>
-            <span className="text-[10px] tracking-widest text-indigo-400 font-mono uppercase block mb-1">AI VERIFICATION & LEDGER CONSENSUS REPORT</span>
+          <div className="text-left">
+            <span className="text-[10px] tracking-widest text-indigo-400 font-mono uppercase block mb-1">
+              {lang === 'fa' ? 'تایید هوش مصنوعی و گزارش اجماع دفترکل' : 'AI VERIFICATION & LEDGER CONSENSUS REPORT'}
+            </span>
             <h2 className="text-lg font-serif italic text-indigo-400 flex items-center gap-2">
               <Network className="w-5 h-5 text-indigo-500" />
-              Genesis Proof NFT #{nft.token_id}: "{nft.title}"
+              {lang === 'fa' ? `سند اثبات جنسیس NFT #${nft.token_id}: "${nft.title}"` : `Genesis Proof NFT #${nft.token_id}: "${nft.title}"`}
             </h2>
           </div>
           <button
             onClick={onClose}
             className="text-indigo-400 hover:text-indigo-300 px-4 py-1.5 bg-indigo-500/5 hover:bg-indigo-500/15 border border-indigo-500/20 rounded-sm text-xs font-bold uppercase transition-colors cursor-pointer"
           >
-            Close
+            {lang === 'fa' ? 'بستن' : 'Close'}
           </button>
         </div>
 
@@ -215,7 +218,7 @@ class GenesisProof(gl.Contract):
             }`}
           >
             <Cpu className="w-4 h-4" />
-            AI Validator Consensus Nodes
+            {lang === 'fa' ? 'نودهای اجماع اعتبارسنج هوش مصنوعی' : 'AI Validator Consensus Nodes'}
           </button>
           <button
             onClick={() => setActiveTab('code')}
@@ -226,7 +229,7 @@ class GenesisProof(gl.Contract):
             }`}
           >
             <Code className="w-4 h-4" />
-            GenLayer Intelligent Contract (Python)
+            {lang === 'fa' ? 'قرارداد هوشمند جن‌لایر (پایتون)' : 'GenLayer Intelligent Contract (Python)'}
           </button>
         </div>
 
@@ -237,7 +240,9 @@ class GenesisProof(gl.Contract):
               {/* Top Summary Banner */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-black p-4 rounded-xl border border-indigo-500/20 shadow-inner">
                 <div className="text-center p-2 border-r border-indigo-500/10">
-                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">Authenticity Status</span>
+                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">
+                    {lang === 'fa' ? 'وضعیت اصالت' : 'Authenticity Status'}
+                  </span>
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[10px] font-mono tracking-wider ${
                     nft.authenticity_status === 'VERIFIED_ORIGINAL' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
                     nft.authenticity_status === 'PROBABLE_ORIGINAL' ? 'bg-indigo-600/10 text-indigo-500 border border-indigo-500/20' :
@@ -245,22 +250,34 @@ class GenesisProof(gl.Contract):
                     'bg-zinc-800/10 text-indigo-500 border border-indigo-500/20'
                   }`}>
                     <CheckCircle className="w-3.5 h-3.5" />
-                    {nft.authenticity_status}
+                    {lang === 'fa' ? (
+                      nft.authenticity_status === 'VERIFIED_ORIGINAL' ? 'تاییدشده کاملا اصیل' :
+                      nft.authenticity_status === 'PROBABLE_ORIGINAL' ? 'احتمالا اصیل' :
+                      nft.authenticity_status === 'DISPUTED' ? 'مورد اختلاف' : nft.authenticity_status
+                    ) : nft.authenticity_status}
                   </span>
                 </div>
                 <div className="text-center p-2 border-r border-indigo-500/10">
-                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">Authenticity Score</span>
+                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">
+                    {lang === 'fa' ? 'امتیاز اصالت' : 'Authenticity Score'}
+                  </span>
                   <span className="text-xl font-serif italic text-indigo-400">{nft.authenticity_score} / 100</span>
                 </div>
                 <div className="text-center p-2 border-r border-indigo-500/10">
-                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">Consensus Model</span>
+                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">
+                    {lang === 'fa' ? 'مدل اجماع' : 'Consensus Model'}
+                  </span>
                   <span className="text-xs font-mono text-indigo-400 block mt-0.5">
-                    3 / 3 Node Agreement
+                    {lang === 'fa' ? 'توافق ۳ از ۳ نود' : '3 / 3 Node Agreement'}
                   </span>
                 </div>
                 <div className="text-center p-2">
-                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">GenLayer Principle</span>
-                  <span className="text-[10px] font-mono text-indigo-400 block mt-1">Optimistic Democracy</span>
+                  <span className="text-[10px] text-indigo-600 font-mono uppercase block mb-1">
+                    {lang === 'fa' ? 'مکانیزم جن‌لایر' : 'GenLayer Principle'}
+                  </span>
+                  <span className="text-[10px] font-mono text-indigo-400 block mt-1">
+                    {lang === 'fa' ? 'معادل آرا و دموکراسی' : 'Optimistic Democracy'}
+                  </span>
                 </div>
               </div>
 
@@ -269,29 +286,29 @@ class GenesisProof(gl.Contract):
                 {(nft.validators || [
                   {
                     name: "Scholar AI",
-                    role: "Prior Art Crawler",
+                    role: lang === 'fa' ? "پایشگر پیشینه آثار" : "Prior Art Crawler",
                     decision: "APPROVED" as const,
                     originalityScore: nft.authenticity_score,
                     similarityScore: null,
-                    rationale: "Validated originality claims against general web crawl and Google Image tags. No earlier footprint of identical structures.",
+                    rationale: lang === 'fa' ? "بررسی اصالت با جستجوی کلی وب و تگ‌های تصویری گوگل انجام شد. هیچ سابقه‌ای از اثر مشابه یافت نشد." : "Validated originality claims against general web crawl and Google Image tags. No earlier footprint of identical structures.",
                     evidenceFound: []
                   },
                   {
                     name: "Legal Counsel AI",
-                    role: "Jurisdiction & IP Audit",
+                    role: lang === 'fa' ? "حسابرس مالکیت معنوی" : "Jurisdiction & IP Audit",
                     decision: "APPROVED" as const,
                     originalityScore: nft.authenticity_score,
                     similarityScore: null,
-                    rationale: "No trademark blocks. Independent transformational factors observed. Verified compliant with copyright guidelines.",
+                    rationale: lang === 'fa' ? "هیچ تداخل علامت تجاری وجود ندارد. فاکتورهای تحول مستقل اثر تایید گردید و با قوانین کپی‌رایت سازگار است." : "No trademark blocks. Independent transformational factors observed. Verified compliant with copyright guidelines.",
                     evidenceFound: []
                   },
                   {
                     name: "Industry Expert AI",
-                    role: "Style & Authenticity Auditor",
+                    role: lang === 'fa' ? "حسابرس سبک و اصالت هنری" : "Style & Authenticity Auditor",
                     decision: "APPROVED" as const,
                     originalityScore: nft.authenticity_score,
                     similarityScore: null,
-                    rationale: "Unique visual signature. Dynamic metadata parameters correctly aligned to lineage and smart-contract specifications.",
+                    rationale: lang === 'fa' ? "امضای بصری منحصربه‌فرد اثر تایید شد. فراداده‌های پویا به درستی با شبیه‌ساز قرارداد هوشمند همگام هستند." : "Unique visual signature. Dynamic metadata parameters correctly aligned to lineage and smart-contract specifications.",
                     evidenceFound: []
                   }
                 ]).map((validator, idx) => (
@@ -325,11 +342,15 @@ class GenesisProof(gl.Contract):
                       {/* Metric Scores */}
                       <div className="grid grid-cols-2 gap-2 text-center bg-black p-2.5 rounded-sm border border-indigo-500/10 font-mono">
                         <div>
-                          <span className="block text-[8px] text-indigo-600 uppercase tracking-widest mb-0.5">Originality</span>
+                          <span className="block text-[8px] text-indigo-600 uppercase tracking-widest mb-0.5">
+                            {lang === 'fa' ? 'اصالت' : 'Originality'}
+                          </span>
                           <span className="text-xs font-bold text-indigo-400">{validator.originalityScore}%</span>
                         </div>
                         <div>
-                          <span className="block text-[8px] text-indigo-600 uppercase tracking-widest mb-0.5">Similarity Ratio</span>
+                          <span className="block text-[8px] text-indigo-600 uppercase tracking-widest mb-0.5">
+                            {lang === 'fa' ? 'نسبت شباهت' : 'Similarity Ratio'}
+                          </span>
                           <span className="text-xs font-bold text-indigo-300">
                             {validator.similarityScore !== null ? `${validator.similarityScore}%` : 'N/A'}
                           </span>
@@ -337,23 +358,25 @@ class GenesisProof(gl.Contract):
                       </div>
 
                       {/* Rationale Text */}
-                      <div className="flex-1">
-                        <span className="block text-[9px] text-indigo-600 font-mono uppercase tracking-wider mb-1.5">Validator Rationale:</span>
-                        <p className="text-xs text-indigo-500/90 italic leading-relaxed bg-black p-3 rounded-sm border border-indigo-500/10">
+                      <div className="flex-1 text-left">
+                        <span className="block text-[9px] text-indigo-600 font-mono uppercase tracking-wider mb-1.5 text-left">
+                          {lang === 'fa' ? 'استدلال اعتبارسنج:' : 'Validator Rationale:'}
+                        </span>
+                        <p className="text-xs text-indigo-500/90 italic leading-relaxed bg-black p-3 rounded-sm border border-indigo-500/10 text-left">
                           "{validator.rationale}"
                         </p>
                       </div>
 
                       {/* Evidence Grounding */}
                       {validator.evidenceFound && validator.evidenceFound.length > 0 && (
-                        <div className="pt-2 border-t border-indigo-500/10">
-                          <span className="flex items-center gap-1.5 text-[9px] text-indigo-600 font-mono uppercase tracking-wider mb-1.5">
+                        <div className="pt-2 border-t border-indigo-500/10 text-left">
+                          <span className="flex items-center gap-1.5 text-[9px] text-indigo-600 font-mono uppercase tracking-wider mb-1.5 text-left">
                             <Search className="w-3.5 h-3.5 text-indigo-400" />
-                            Discovered References:
+                            {lang === 'fa' ? 'مراجع کشف شده:' : 'Discovered References:'}
                           </span>
-                          <ul className="space-y-1">
+                          <ul className="space-y-1 text-left">
                             {validator.evidenceFound.map((ref, rIdx) => (
-                              <li key={rIdx} className="flex items-start gap-1.5 text-indigo-500/70 text-[11px] font-mono">
+                              <li key={rIdx} className="flex items-start gap-1.5 text-indigo-500/70 text-[11px] font-mono text-left">
                                 <span className="text-yellow-700 mt-1">•</span>
                                 <span className="leading-snug break-all">{ref.description} ({ref.url})</span>
                               </li>
@@ -372,9 +395,11 @@ class GenesisProof(gl.Contract):
               {/* Educational Sidebar */}
               <div className="lg:col-span-4 space-y-4">
                 <div className="bg-black border border-indigo-500/20 p-5 rounded-xl space-y-4 shadow-lg text-left">
-                  <h4 className="font-serif italic text-indigo-400 text-sm border-b border-indigo-500/10 pb-2">Developer Actions</h4>
+                  <h4 className="font-serif italic text-indigo-400 text-sm border-b border-indigo-500/10 pb-2">
+                    {lang === 'fa' ? 'عملیات توسعه‌دهنده' : 'Developer Actions'}
+                  </h4>
                   <p className="text-xs text-indigo-500/70 leading-relaxed">
-                    Review or copy the Genesis Proof smart contract source code. Only possible on GenLayer by leveraging decentralized Python runtimes.
+                    {lang === 'fa' ? 'کد منبع قرارداد هوشمند اثبات اصالت جنسیس را بررسی یا کپی کنید. این معماری نوین تنها در بستر جن لایر و با کمک اجرای غیرمتمرکز پایتون و مراجع وب ممکن است.' : 'Review or copy the Genesis Proof smart contract source code. Only possible on GenLayer by leveraging decentralized Python runtimes.'}
                   </p>
                   
                   <div className="flex flex-col gap-2">
@@ -384,17 +409,17 @@ class GenesisProof(gl.Contract):
                         setCopied(true);
                         setTimeout(() => setCopied(false), 2000);
                       }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white active:scale-[0.98] transition-all text-black font-bold rounded-sm text-xs uppercase tracking-wider cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white active:scale-[0.98] transition-all font-bold rounded-sm text-xs uppercase tracking-wider cursor-pointer"
                     >
                       {copied ? (
                         <>
                           <Check className="w-4 h-4 text-emerald-950" />
-                          <span>Copied!</span>
+                          <span>{lang === 'fa' ? 'کپی شد!' : 'Copied!'}</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-4 h-4" />
-                          <span>Copy Python Contract</span>
+                          <span>{lang === 'fa' ? 'کپی قرارداد پایتون' : 'Copy Python Contract'}</span>
                         </>
                       )}
                     </button>
@@ -414,27 +439,33 @@ class GenesisProof(gl.Contract):
                       className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-500/5 hover:bg-indigo-500/15 border border-indigo-500/20 transition-colors text-indigo-400 rounded-sm text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
                       <Download className="w-4 h-4 text-indigo-500" />
-                      <span>Download genesis_proof.py</span>
+                      <span>{lang === 'fa' ? 'دانلود فایل پایتون' : 'Download genesis_proof.py'}</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="bg-black border border-indigo-500/20 p-5 rounded-xl space-y-4 text-left">
-                  <h4 className="font-serif italic text-indigo-400 text-sm border-b border-indigo-500/10 pb-2">
-                    Why GenLayer-Native?
+                  <h4 className="font-serif italic text-indigo-400 text-sm border-b border-indigo-500/10 pb-2 text-left">
+                    {lang === 'fa' ? 'چرا معماری جن‌لایر بومی؟' : 'Why GenLayer-Native?'}
                   </h4>
-                  <div className="space-y-3.5 text-xs text-indigo-500/80 leading-relaxed">
-                    <p>
-                      <strong className="text-indigo-400 block font-mono">1. Gated Mints:</strong>
-                      Minting is not a rubber stamp. Web crawls (`gl.nondet.web.render`) search for conflicts and reject duplicates *before* the token ever exists.
+                  <div className="space-y-3.5 text-xs text-indigo-500/80 leading-relaxed text-left">
+                    <p className="text-left">
+                      <strong className="text-indigo-400 block font-mono text-left">
+                        {lang === 'fa' ? '۱. مینت با بررسی اولیه:' : '1. Gated Mints:'}
+                      </strong>
+                      {lang === 'fa' ? 'عملیات مینت کردن صرفاً مهر تایید صوری نیست. جستجوگر وب غیرمتمرکز قبل از ساخت توکن اصالت اثر را بررسی و تایید می‌نماید.' : 'Minting is not a rubber stamp. Web crawls (`gl.nondet.web.render`) search for conflicts and reject duplicates *before* the token ever exists.'}
                     </p>
-                    <p>
-                      <strong className="text-indigo-400 block font-mono">2. Dynamic Decay:</strong>
-                      Authenticity decays mathematically over time upon continuous public write audits, preventing static forgery.
+                    <p className="text-left">
+                      <strong className="text-indigo-400 block font-mono text-left">
+                        {lang === 'fa' ? '۲. افت ریاضی اعتبار:' : '2. Dynamic Decay:'}
+                      </strong>
+                      {lang === 'fa' ? 'اصالت آثار ثابت نیست بلکه با گذشت زمان و عدم تکرار بررسی‌ها به مرور کسر می‌شود تا اصالت همواره پویا ارزیابی شود.' : 'Authenticity decays mathematically over time upon continuous public write audits, preventing static forgery.'}
                     </p>
-                    <p>
-                      <strong className="text-indigo-400 block font-mono">3. On-chain Consensus:</strong>
-                      Validators run decentralized web searches to resolve consensus on the originality state of each work transparently.
+                    <p className="text-left">
+                      <strong className="text-indigo-400 block font-mono text-left">
+                        {lang === 'fa' ? '۳. اجماع نودهای هوشمند:' : '3. On-chain Consensus:'}
+                      </strong>
+                      {lang === 'fa' ? 'نودهای اعتبارسنج جن‌لایر مستقیما پرامپت‌ها و جستارهای اینترنتی را به صورت غیرمتمرکز برای حصول شفاف‌ترین نتیجه توافق اجرا می‌کنند.' : 'Validators run decentralized web searches to resolve consensus on the originality state of each work transparently.'}
                     </p>
                   </div>
                 </div>

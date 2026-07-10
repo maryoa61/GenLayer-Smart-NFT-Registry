@@ -4,16 +4,18 @@ import { Sparkles, ArrowLeft, Network, HelpCircle, DollarSign } from 'lucide-rea
 interface SubmitPatentFormProps {
   onCancel: () => void;
   onSuccess: (newNft: any) => void;
+  lang: 'fa' | 'en';
 }
 
-export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFormProps) {
+export default function SubmitPatentForm({ onCancel, onSuccess, lang }: SubmitPatentFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     creator: '',
     category: 'Digital Art',
     description: '',
     mediaUrl: '',
-    feeSent: '0.05' // required fee is 0.05
+    feeSent: '0.05', // required fee is 0.05
+    royaltyPercentage: '10' // default royalty is 10%
   });
 
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,14 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
     'Text/Literary'
   ];
 
-  const loadingSteps = [
+  const loadingSteps = lang === 'fa' ? [
+    'در حال ارسال اطلاعات تراکنش به استخر سندباکس جن‌لایر...',
+    'راه‌اندازی ۳ نود اعتبارسنج هوشمند (دانشگاهی، مشاور حقوقی، کارشناس صنعت)...',
+    'اجرای پایش وب در محیط سندباکس برای کشف موارد کپی یا سرقت اثر...',
+    'بررسی مدل چندعاملی هوش مصنوعی بر روی توضیحات هنری و نوآوری اثر...',
+    'محاسبه معادل آرا و نتایج اجماع از طریق gl.eq_principle در جن‌لایر...',
+    'ثبت نهایی تراکنش روی دفترکل جن‌لایر و تایید وضعیت اصالت...'
+  ] : [
     'Submitting transaction payload to GenLayer sandbox pool...',
     'Spinning up 3 intelligent validator nodes (Scholar AI, Legal Counsel AI, Industry Expert AI)...',
     'Executing sandboxed web crawl to detect duplicate/plagiarized creations...',
@@ -39,7 +48,7 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.creator || !formData.description || !formData.mediaUrl) {
-      alert('لطفاً تمامی فیلدهای الزامی را تکمیل کنید.');
+      alert('Please complete all required fields.');
       return;
     }
 
@@ -68,7 +77,8 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
           media_url: formData.mediaUrl,
           category: formData.category,
           creator: formData.creator,
-          fee_sent: formData.feeSent
+          fee_sent: formData.feeSent,
+          royalty_percentage: formData.royaltyPercentage
         })
       });
       const data = await res.json();
@@ -84,12 +94,11 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
       console.error(err);
       clearInterval(interval);
       setLoading(false);
-      alert("خطا در اجرای تراکنش در گره شبیه‌ساز GenLayer.");
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-black border border-indigo-500/30 rounded-xl overflow-hidden p-6 sm:p-8 shadow-[0_0_40px_rgba(99,102,241,0.15)]">
+    <div className="w-full max-w-4xl mx-auto bg-black border border-indigo-500/30 rounded-xl overflow-hidden p-6 sm:p-8 shadow-[0_0_40px_rgba(99,102,241,0.15)]" dir={lang === 'fa' ? 'rtl' : 'ltr'}>
       {!loading ? (
         <div className="space-y-6">
           {/* Header */}
@@ -99,9 +108,11 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
                 <Sparkles className="w-6 h-6 animate-pulse" />
               </div>
               <div className="text-left">
-                <h2 className="text-xl font-serif italic text-indigo-400 tracking-tight">ثبت اثر و ثبت اصالت در GenLayer</h2>
-                <p className="text-xs text-indigo-500/70 mt-1">
-                  تحت نظارت گره‌های اعتبارسنج هوش مصنوعی چندعاملی و بررسی پایگاه داده‌های برخط.
+                <h2 className="text-xl font-serif italic text-indigo-400 tracking-tight text-left">
+                  {lang === 'fa' ? 'ثبت و تایید اصالت در شبکه جن‌لایر' : 'Register & Verify Authenticity on GenLayer'}
+                </h2>
+                <p className="text-xs text-indigo-500/70 mt-1 text-left">
+                  {lang === 'fa' ? 'تحت اعتبارسنجی توسط نودهای هوش مصنوعی چندعاملی و پایش آنی وب.' : 'Under validation by multi-agent AI validator nodes and real-time online database scrapes.'}
                 </p>
               </div>
             </div>
@@ -109,24 +120,24 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
               onClick={onCancel}
               className="flex items-center gap-1.5 self-start sm:self-center px-3 py-1.5 bg-indigo-500/5 hover:bg-indigo-500/15 text-indigo-400 border border-indigo-500/20 rounded-sm text-xs font-bold uppercase transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> بازگشت
+              <ArrowLeft className="w-3.5 h-3.5" /> {lang === 'fa' ? 'بازگشت' : 'Back'}
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5 text-left" dir="rtl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-right">
+          <form onSubmit={handleSubmit} className="space-y-5 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
               {/* Creator Address */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80">
-                  آدرس سازنده (Minter Address) <span className="text-indigo-500">*</span>
+                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 text-left">
+                  {lang === 'fa' ? 'آدرس فرستنده / مینت‌کننده *' : 'Creator Address (Minter Address) *'}
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.creator}
                   onChange={(e) => setFormData({ ...formData, creator: e.target.value })}
-                  placeholder="مثال: 0x98Be6A611fbc9c72E9D1E842910d55e3477f1E22a"
+                  placeholder="e.g. 0x4A7b99c72E9D1E842910d55e3477f1E22a..."
                   className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all font-mono text-left"
                   id="input-creator"
                   dir="ltr"
@@ -135,29 +146,31 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
 
               {/* Title */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80">
-                  عنوان اثر (Title) <span className="text-indigo-500">*</span>
+                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 text-left">
+                  {lang === 'fa' ? 'عنوان اثر *' : 'Title *'}
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="مثال: غروب دیجیتال"
-                  className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all font-sans"
+                  placeholder="e.g. Digital Sunset"
+                  className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all text-left"
                   id="input-title"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-right">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
               {/* Category */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80">دسته‌بندی (Category)</label>
+                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 text-left">
+                  {lang === 'fa' ? 'دسته‌بندی' : 'Category'}
+                </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 focus:outline-none focus:border-indigo-400 transition-all font-sans"
+                  className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 focus:outline-none focus:border-indigo-400 transition-all text-left"
                   id="select-category"
                 >
                   {categories.map((c) => (
@@ -168,15 +181,15 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
 
               {/* Media URL */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80">
-                  لینک تصویر یا مدیا (Media URL) <span className="text-indigo-500">*</span>
+                <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 text-left">
+                  {lang === 'fa' ? 'لینک تصویر یا رسانه *' : 'Media URL *'}
                 </label>
                 <input
                   type="url"
                   required
                   value={formData.mediaUrl}
                   onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/photo-... or digital-art.png"
+                  placeholder="https://images.unsplash.com/photo-..."
                   className="w-full px-4 py-2.5 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all font-mono text-left"
                   id="input-media-url"
                   dir="ltr"
@@ -185,64 +198,98 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
             </div>
 
             {/* Description */}
-            <div className="flex flex-col gap-1.5 text-right">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 flex items-center gap-1.5 justify-end">
-                <HelpCircle className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-400 cursor-help" title="توسط اعتبارسنج‌ها برای بررسی اصالت و تشخیص سرقت ادبی تحلیل می‌شود." />
-                توضیحات اثر و بیانیه هنری <span className="text-indigo-500">*</span>
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="text-[11px] font-mono uppercase tracking-wider text-indigo-500/80 flex items-center gap-1.5 justify-start text-left">
+                <HelpCircle className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-400 cursor-help" />
+                {lang === 'fa' ? 'توضیحات و بیانیه هنری اثر *' : 'Artistic Statement & Description *'}
               </label>
               <textarea
                 required
                 rows={4}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="توضیحات کاملی درباره اثر خود بنویسید. راهنما: برای شبیه‌سازی ردِ تراکنش توسط هوش مصنوعی به دلیل سرقت ادبی، در عنوان یا توضیحات از کلمه 'copy' یا 'stolen' استفاده کنید."
-                className="w-full px-4 py-3 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all font-sans leading-relaxed"
+                placeholder={lang === 'fa' ? "توضیحات کامل اثر خود را بنویسید. راهنما: برای شبیه‌سازی رد اثر به دلیل سرقت ادبی، کلمه 'copy' یا 'stolen' را اضافه کنید." : "Write a complete description of your work. Tip: To simulate an AI rejection due to plagiarism, include the word 'copy' or 'stolen' in the title or description."}
+                className="w-full px-4 py-3 bg-black border border-indigo-500/25 rounded-sm text-xs text-indigo-400 placeholder-indigo-800/60 focus:outline-none focus:border-indigo-400 transition-all leading-relaxed text-left"
                 id="input-description"
               />
             </div>
 
             {/* Custom Minting Fee Slider */}
-            <div className="bg-black border border-indigo-500/15 p-4 rounded-sm space-y-3.5 shadow-inner text-right">
-              <div className="flex items-center justify-between">
-                <div className="text-right">
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-1.5 justify-end">
-                    <DollarSign className="w-4 h-4 text-indigo-400" />
-                    هزینه ضرب و کارمزد تراکنش
-                  </h4>
-                  <p className="text-[11px] text-indigo-500/60 mt-1">
-                    حداقل هزینه مورد نیاز: <span className="text-indigo-400 font-mono font-bold">0.05 GETH</span>. مابقی به طور خودکار به عنوان اضافه پرداختی در نظر گرفته می‌شود.
-                  </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="bg-black border border-indigo-500/15 p-4 rounded-sm space-y-3.5 shadow-inner text-left">
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-1.5 text-left">
+                      <DollarSign className="w-4 h-4 text-indigo-400" />
+                      {lang === 'fa' ? 'کارمزد مینت و ثبت تراکنش' : 'Minting & Transaction Fee'}
+                    </h4>
+                    <p className="text-[11px] text-indigo-500/60 mt-1 text-left">
+                      {lang === 'fa' ? 'کارمزد مربوط به ثبت در قرارداد هوشمند (قرارداد ۱).' : 'Required for Registry Contract (Contract 1).'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-mono font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-sm">
+                      {formData.feeSent} GETH
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-lg font-mono font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-sm">
-                    {formData.feeSent} GETH
-                  </span>
+                <input
+                  type="range"
+                  min="0.05"
+                  max="1.0"
+                  step="0.05"
+                  value={formData.feeSent}
+                  onChange={(e) => setFormData({ ...formData, feeSent: e.target.value })}
+                  className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-indigo-500/10 rounded-lg appearance-none"
+                />
+                <div className="flex justify-between text-[9px] font-mono text-indigo-600/70" dir="ltr">
+                  <span>0.05 GETH (Standard Mint)</span>
+                  <span>1.00 GETH (Trigger Refund)</span>
                 </div>
               </div>
-              <input
-                type="range"
-                min="0.05"
-                max="1.0"
-                step="0.05"
-                value={formData.feeSent}
-                onChange={(e) => setFormData({ ...formData, feeSent: e.target.value })}
-                className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-indigo-500/10 rounded-lg appearance-none"
-              />
-              <div className="flex justify-between text-[9px] font-mono text-indigo-600/70" dir="ltr">
-                <span>0.05 GETH (Standard Mint)</span>
-                <span>0.50 GETH</span>
-                <span>1.00 GETH (Trigger Overpay Refund)</span>
+
+              {/* Royalty Split Setting */}
+              <div className="bg-black border border-indigo-500/15 p-4 rounded-sm space-y-3.5 shadow-inner text-left">
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-1.5 text-left">
+                      <Sparkles className="w-4 h-4 text-indigo-400" />
+                      {lang === 'fa' ? 'سهم حق‌امتیاز (رویالیتی) سازنده (٪)' : 'Creator Royalty Split (%)'}
+                    </h4>
+                    <p className="text-[11px] text-indigo-500/60 mt-1 text-left">
+                      {lang === 'fa' ? 'تنظیم قوانین تقسیم سهم در قرارداد بازار (قرارداد ۳).' : 'Configures Royalties Contract (Contract 3) rules.'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-mono font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-sm">
+                      {formData.royaltyPercentage}%
+                    </span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="1"
+                  value={formData.royaltyPercentage}
+                  onChange={(e) => setFormData({ ...formData, royaltyPercentage: e.target.value })}
+                  className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-indigo-500/10 rounded-lg appearance-none"
+                />
+                <div className="flex justify-between text-[9px] font-mono text-indigo-600/70" dir="ltr">
+                  <span>0% (No split)</span>
+                  <span>30% (High secondary split)</span>
+                </div>
               </div>
             </div>
 
             {/* Submit & Cancel Buttons */}
-            <div className="flex items-center justify-end gap-3.5 pt-4 border-t border-indigo-500/20 text-right">
+            <div className="flex items-center justify-end gap-3.5 pt-4 border-t border-indigo-500/20 text-left">
               <button
                 type="button"
                 onClick={onCancel}
                 className="px-5 py-2.5 bg-indigo-500/5 hover:bg-indigo-500/15 text-indigo-400 border border-indigo-500/20 rounded-sm text-xs font-bold uppercase transition-colors cursor-pointer"
               >
-                انصراف
+                {lang === 'fa' ? 'لغو' : 'Cancel'}
               </button>
               <button
                 type="submit"
@@ -250,7 +297,7 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
                 id="btn-submit"
               >
                 <Network className="w-3.5 h-3.5" />
-                ارسال به استخر اعتبارسنجی GenLayer
+                {lang === 'fa' ? 'ارسال به استخر اعتبارسنجی جن‌لایر' : 'Submit to GenLayer Validation Pool'}
               </button>
             </div>
           </form>
@@ -267,7 +314,7 @@ export default function SubmitPatentForm({ onCancel, onSuccess }: SubmitPatentFo
 
           <div className="space-y-3 max-w-lg">
             <h3 className="text-lg font-serif italic text-indigo-400 flex items-center justify-center gap-2">
-              اجرای قرارداد هوشمند در GenLayer Sandbox
+              {lang === 'fa' ? 'در حال اجرای قرارداد هوشمند هوش‌مصنوعی در سندباکس جن‌لایر' : 'Executing Intelligent Contract in GenLayer Sandbox'}
             </h3>
             <p className="text-xs text-indigo-500/80 leading-relaxed min-h-[3rem] px-4 font-sans italic">
               {loadingSteps[loadingStep]}

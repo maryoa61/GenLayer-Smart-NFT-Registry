@@ -282,20 +282,22 @@ function runGenLayerConsensusSimulation(
   };
 }
 
-// 1. MINT NFT
+// 1. MINT NFT (talks to Contract 1: Registry & Consensus - 0x7a8eEaD39908F09cbCa656E6cBc2A35CE8712C2a)
 app.post('/api/nfts/mint', (req, res) => {
-  const { title, description, media_url, category, creator, fee_sent } = req.body;
+  const { title, description, media_url, category, creator, fee_sent, royalty_percentage } = req.body;
   if (!title || !description || !media_url || !category || !creator) {
     return res.status(400).json({ error: "Missing required minting parameters." });
   }
 
-  addLog("MINT_NFT", `Simulating GenLayer multi-agent consensus for: "${title}"`, 'INFO');
+  const contractAddress = "0x7a8eEaD39908F09cbCa656E6cBc2A35CE8712C2a";
+  addLog("CONTRACT_1:MINT_REGISTRY", `App orchestrated call to Registry Contract [${contractAddress}] for: "${title}"`, 'INFO');
+  addLog("CONTRACT_1:AI_CONSENSUS", `Invoking AI Consensus pool (Scholar, Legal, Industry nodes)`, 'INFO');
 
   const simulation = runGenLayerConsensusSimulation(title, description, category, media_url);
 
   // If rejected
   if (!simulation.isOriginal || simulation.avgOriginality < 40) {
-    addLog("MINT_NFT", `Mint REJECTED for "${title}". Originality Score (${simulation.avgOriginality}) below threshold. Minting fee refunded to ${creator}`, 'ERROR');
+    addLog("CONTRACT_1:REJECTED", `Mint REJECTED for "${title}". Originality Score (${simulation.avgOriginality}) below threshold. Minting fee refunded to ${creator}`, 'ERROR');
     return res.json({
       success: false,
       status: "REJECTED",
@@ -308,6 +310,7 @@ app.post('/api/nfts/mint', (req, res) => {
   // Mint Success
   const tokenId = (nextTokenId++).toString();
   const status = simulation.avgOriginality >= 85 ? "VERIFIED_ORIGINAL" : "PROBABLE_ORIGINAL";
+  const finalRoyalty = royalty_percentage ? Number(royalty_percentage) : 10;
 
   const newNFT: NFT_Record = {
     token_id: tokenId,
@@ -326,16 +329,19 @@ app.post('/api/nfts/mint', (req, res) => {
         timestamp: new Date().toISOString(),
         score_before: simulation.avgOriginality,
         score_after: simulation.avgOriginality,
-        findings: `Initial GenLayer verification complete. Status set to ${status}. Agreement reached across all 3 nodes.`,
+        findings: `Initial GenLayer verification complete on Contract 1. Status set to ${status}. Agreement reached across all 3 nodes.`,
         triggered_by: "0xGP_Protocol_v1"
       }
     ],
-    validators: simulation.validators
+    validators: simulation.validators,
+    royalty_percentage: finalRoyalty,
+    is_listed: false,
+    price: 0
   };
 
   nfts.unshift(newNFT);
 
-  addLog("MINT_NFT", `NFT Minted Successfully! Token ID: ${tokenId} | Status: ${status} | Score: ${simulation.avgOriginality}`, 'SUCCESS');
+  addLog("CONTRACT_1:MINT_SUCCESS", `NFT permanent state written on Registry [${contractAddress}]. Token ID: #${tokenId} | Status: ${status} | Score: ${simulation.avgOriginality}`, 'SUCCESS');
 
   res.json({
     success: true,
@@ -344,7 +350,7 @@ app.post('/api/nfts/mint', (req, res) => {
   });
 });
 
-// 2. AUDIT PROVENANCE
+// 2. AUDIT PROVENANCE (talks to Contract 2: Audit & Reputation - 0x32A5b9e22A1D31Cd98Be6A611fbc9c72E9D1E842)
 app.post('/api/nfts/audit', (req, res) => {
   const { token_id, caller } = req.body;
   if (!token_id) {
@@ -356,22 +362,26 @@ app.post('/api/nfts/audit', (req, res) => {
     return res.status(404).json({ error: "NFT not found" });
   }
 
-  addLog("AUDIT_PROVENANCE", `Re-evaluating web registry footprint for NFT #${token_id}`, 'INFO');
+  const contractAddress = "0x32A5b9e22A1D31Cd98Be6A611fbc9c72E9D1E842";
+  addLog("CONTRACT_2:AUDIT_REPUTATION", `App orchestrated call to Audit & Reputation Contract [${contractAddress}] for NFT #${token_id}`, 'INFO');
+  addLog("CONTRACT_2:DECAY_FORMULA", `Applying mathematical decay formula: DecayedScore = (PreviousScore * 0.7) + (LatestAudit * 0.3)`, 'INFO');
 
   // Simulate a fresh search
   const isBadAudit = Math.random() > 0.85 || nft.title.toLowerCase().includes("decay") || nft.description.toLowerCase().includes("decay");
   const freshScore = isBadAudit ? Math.floor(20 + Math.random() * 20) : Math.floor(88 + Math.random() * 12);
   const oldScore = nft.authenticity_score;
+  
+  // Mathematical Decay calculation
   const decayedScore = Math.round(oldScore * 0.7 + freshScore * 0.3);
 
   // Status transitions
   let finalStatus = nft.authenticity_status;
-  let findings = `Continuous search evaluated. Fresh consensus score is ${freshScore}. Decayed average: ${decayedScore}. No conflicting claims.`;
+  let findings = `Continuous search evaluated via Contract 2 decay formula. Fresh consensus score is ${freshScore}. Decayed average: ${decayedScore}. No conflicting claims.`;
 
   if (decayedScore < 40) {
     finalStatus = "DISPUTED";
     findings = `CRITICAL ALERT: Audit score dropped below threshold (Score: ${decayedScore}). High correlation of copycat activities detected.`;
-    addLog("AUDIT_PROVENANCE", `WARNING: NFT #${token_id} score dropped below 40. Down-graded to DISPUTED!`, 'WARNING');
+    addLog("CONTRACT_2:DISPUTE_TRIGGERED", `WARNING: NFT #${token_id} reputation score dropped below 40. Down-graded to DISPUTED!`, 'WARNING');
   } else if (decayedScore >= 85) {
     finalStatus = "VERIFIED_ORIGINAL";
   } else {
@@ -389,7 +399,7 @@ app.post('/api/nfts/audit', (req, res) => {
     triggered_by: caller || "0xAnonymous"
   });
 
-  addLog("AUDIT_PROVENANCE", `Audit Complete for #${token_id}. Current Score: ${decayedScore} | Status: ${finalStatus}`, 'SUCCESS');
+  addLog("CONTRACT_2:AUDIT_COMPLETE", `Audit complete on Contract 2. Current Score: ${decayedScore} | Status: ${finalStatus}`, 'SUCCESS');
 
   res.json({
     success: true,
@@ -414,10 +424,97 @@ app.post('/api/nfts/transfer', (req, res) => {
   }
 
   nft.owner = to;
+  nft.is_listed = false; // Delist on manual transfer
 
-  addLog("TRANSFER_NFT", `NFT #${token_id} manually transferred from ${caller} to ${to}. Creator/provenance history preserved.`, 'SUCCESS');
+  addLog("CONTRACT_3:MANUAL_TRANSFER", `NFT #${token_id} manually transferred. Preserving provenance.`, 'SUCCESS');
 
   res.json({ success: true, nft });
+});
+
+// 4. LIST FOR SALE (talks to Contract 3: Marketplace & Royalties - 0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd)
+app.post('/api/nfts/list', (req, res) => {
+  const { token_id, price, caller } = req.body;
+  if (!token_id || price === undefined || !caller) {
+    return res.status(400).json({ error: "Missing listing parameters." });
+  }
+
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  if (nft.owner.toLowerCase() !== caller.toLowerCase()) {
+    return res.status(403).json({ error: "Caller is not the current token owner." });
+  }
+
+  nft.is_listed = true;
+  nft.price = Number(price);
+
+  const contractAddress = "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd";
+  addLog("CONTRACT_3:LISTING_ACTIVE", `Marketplace Contract [${contractAddress}] registered Listing: NFT #${token_id} listed for ${price} GETH`, 'SUCCESS');
+
+  res.json({ success: true, nft });
+});
+
+// 5. BUY NFT & DISTRIBUTE ROYALTIES (talks to Contract 3: Marketplace & Royalties - 0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd)
+app.post('/api/nfts/buy', (req, res) => {
+  const { token_id, caller } = req.body;
+  if (!token_id || !caller) {
+    return res.status(400).json({ error: "Missing buying parameters." });
+  }
+
+  const nft = nfts.find(n => n.token_id === token_id);
+  if (!nft) {
+    return res.status(404).json({ error: "NFT not found" });
+  }
+
+  if (!nft.is_listed) {
+    return res.status(400).json({ error: "NFT is not listed for sale." });
+  }
+
+  const seller = nft.owner;
+  const creator = nft.creator;
+  const price = nft.price || 0;
+  const royaltyPercentage = nft.royalty_percentage || 10;
+
+  const contractAddress = "0x4A7b99c72E9D1E842910d55e3477f1E22a1D31Cd";
+  const auditContractAddress = "0x32A5b9e22A1D31Cd98Be6A611fbc9c72E9D1E842";
+  
+  addLog("CONTRACT_3:MARKETPLACE_BUY", `App orchestrated buy call on Marketplace Contract [${contractAddress}] for NFT #${token_id}`, 'INFO');
+  
+  // Real-time inter-contract verification (as requested by User)
+  addLog("CONTRACT_3:VERIFY_PURCHASE", `Marketplace calling Audit Contract [${auditContractAddress}].verify_purchase(#${token_id})`, 'INFO');
+  
+  if (nft.authenticity_score < 40) {
+    addLog("CONTRACT_3:VERIFY_PURCHASE_FAILED", `Purchase REJECTED: Inter-contract call to Audit returned score ${nft.authenticity_score} < 40 (Disputed)`, 'ERROR');
+    return res.status(400).json({ 
+      error: `Cannot buy: Originality score (${nft.authenticity_score}) is too low! Under threshold of 40. Transaction reverted.` 
+    });
+  }
+
+  // Calculate Royalty split
+  const royaltyAmount = Number((price * (royaltyPercentage / 100)).toFixed(4));
+  const sellerRemainder = Number((price - royaltyAmount).toFixed(4));
+
+  addLog("CONTRACT_3:ROYALTY_DISTRIBUTION", `Splitting payment of ${price} GETH: Creator Royalty to ${creator.slice(0,6)}... (${royaltyPercentage}% = ${royaltyAmount} GETH) | Seller share to ${seller.slice(0,6)}... (${sellerRemainder} GETH)`, 'INFO');
+
+  // Complete the transfer
+  nft.owner = caller;
+  nft.is_listed = false;
+  nft.price = 0;
+
+  addLog("CONTRACT_3:TRANSACTION_FINALIZED", `Ownership of NFT #${token_id} successfully transferred to ${caller}. Marketplace records updated!`, 'SUCCESS');
+
+  res.json({
+    success: true,
+    nft,
+    split: {
+      royaltyAmount,
+      sellerRemainder,
+      creator,
+      seller
+    }
+  });
 });
 
 async function startServer() {

@@ -565,6 +565,23 @@ class GenesisProof(gl.Contract):
         self.listings[token_id] = listing
         ListingCancelled(token_id).emit()
 
+    def verify_purchase(self, token_id: u256):
+        """
+        Inter-contract call simulation: queries the Audit Contract (Contract 2)
+        to check the authenticity/originality score at the exact moment of purchase.
+        If the score is below the threshold of 40, the transaction is rejected immediately.
+        """
+        # In a multi-contract architecture, this would be:
+        # audit_contract = gl.get_contract_at(self.audit_contract_address)
+        # score = audit_contract.get_score(token_id)
+        #
+        # For this unified demonstration ledger, we read from storage:
+        record = self.nfts[token_id]
+        score = int(record.authenticity_score)
+        
+        if score < 40:
+            raise Exception("Cannot buy: Originality score too low! Under threshold of 40.")
+
     @gl.public.write.payable
     def buy_nft(self, token_id: u256):
         listing = self.listings[token_id]
@@ -575,6 +592,9 @@ class GenesisProof(gl.Contract):
             raise Exception("This listing is not active.")
         if sent_value < listing.price:
             raise Exception("Insufficient payment for this listing.")
+
+        # Real-time inter-contract check: queries Contract 2 (Audit)
+        self.verify_purchase(token_id)
 
         record = self.nfts[token_id]
         if record.authenticity_status == "REVOKED":
