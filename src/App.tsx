@@ -12,7 +12,7 @@ import ConsensusVisualizer from './components/ConsensusVisualizer';
 import { translations } from './localization';
 
 export default function App() {
-  const [lang, setLang] = useState<'fa' | 'en'>('fa');
+  const [lang, setLang] = useState<'fa' | 'en'>('en');
   const t = translations[lang];
 
   const [nfts, setNfts] = useState<NFT_Record[]>([]);
@@ -57,6 +57,9 @@ export default function App() {
   // Contract Upgrade / Configuration settings
   const [decayWeight, setDecayWeight] = useState(0.7); // Contract 2 decay weight
   const [platformFee, setPlatformFee] = useState(0); // Contract 3 platform fee
+
+  // Interface Role state (User / Project Manager Admin)
+  const [viewRole, setViewRole] = useState<'user' | 'admin'>('user');
 
   // Selected Active Contract on Map for inspection
   const [selectedContractTab, setSelectedContractTab] = useState<'CONTRACT_1' | 'CONTRACT_2' | 'CONTRACT_3'>('CONTRACT_1');
@@ -448,18 +451,44 @@ export default function App() {
 
           {/* User Wallet & Language Control (Simulation) */}
           <div className="flex flex-wrap items-center gap-3.5 bg-indigo-500/[0.02] border border-indigo-500/20 p-2 rounded-sm max-w-full">
-            {/* Language Switcher Button */}
-            <button
-              onClick={() => {
-                const nextLang = lang === 'fa' ? 'en' : 'fa';
-                setLang(nextLang);
-                addLogLocal("LOCALE_CHANGED", `Language context switched to ${nextLang === 'fa' ? 'Persian (فارسی)' : 'English'}`, "INFO");
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-600/15 border border-indigo-500/25 text-indigo-400 text-xs rounded-sm hover:bg-indigo-500/25 transition-all cursor-pointer font-bold font-mono"
-            >
+            {/* View perspective selector (Role) */}
+            <div className="flex items-center gap-1.5 bg-black/60 border border-indigo-500/15 p-1 rounded-sm text-[10px] font-mono">
+              <span className="text-indigo-500/70 px-1 text-[9px] uppercase tracking-wider font-bold">{t.roleSelectorLabel}</span>
+              <button
+                onClick={() => {
+                  setViewRole('user');
+                  addLogLocal("ROLE_SWITCH", "Perspective switched to Client App (Regular User view)", "INFO");
+                }}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all cursor-pointer font-bold uppercase text-[9px] ${
+                  viewRole === 'user'
+                    ? 'bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 font-extrabold shadow-[0_0_10px_rgba(99,102,241,0.2)]'
+                    : 'text-indigo-500/50 hover:text-indigo-400 border border-transparent'
+                }`}
+              >
+                <User className="w-2.5 h-2.5" />
+                <span>{t.userModeToggle.split(' (')[0]}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setViewRole('admin');
+                  addLogLocal("ROLE_SWITCH", "Perspective switched to Control Room (Project Manager view)", "WARNING");
+                }}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all cursor-pointer font-bold uppercase text-[9px] ${
+                  viewRole === 'admin'
+                    ? 'bg-amber-500/25 border border-amber-500/40 text-amber-300 font-extrabold shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                    : 'text-indigo-500/50 hover:text-amber-500 border border-transparent'
+                }`}
+              >
+                <Settings className="w-2.5 h-2.5" />
+                <span>{t.adminModeToggle.split(' (')[0]}</span>
+              </button>
+            </div>
+
+            {/* Language Switcher Badge */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-600/5 border border-indigo-500/15 text-indigo-500 text-xs rounded-sm font-bold font-mono">
               <span>🌐</span>
-              <span>{lang === 'fa' ? 'English (EN)' : 'فارسی (FA)'}</span>
-            </button>
+              <span>English (EN)</span>
+            </div>
 
             {/* Wallet Select */}
             <div className="flex items-center gap-1.5 px-2 py-1 bg-black border border-indigo-500/10 rounded-sm" dir="ltr">
@@ -526,201 +555,203 @@ export default function App() {
       </section>
 
       {/* THREE-CONTRACT LAYERED ORCHESTRATOR BOARD */}
-      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="bg-gradient-to-b from-indigo-950/10 to-black border border-indigo-500/25 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-3 text-[9px] font-mono text-indigo-600/50 uppercase">
-            Control Room v2.4
-          </div>
-          
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-indigo-500/15 pb-4 mb-5">
-            <div className="text-left">
-              <h2 className="text-sm font-mono uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-2">
-                <Layers className="w-4 h-4 text-indigo-400" />
-                {t.contractUpgradeInfo}
-              </h2>
-              <p className="text-xs text-indigo-500/70 mt-1">
-                {t.modularArchDesc}
-              </p>
+      {viewRole === 'admin' && (
+        <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="bg-gradient-to-b from-indigo-950/10 to-black border border-indigo-500/25 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-3 text-[9px] font-mono text-indigo-600/50 uppercase">
+              Control Room v2.4
             </div>
-          </div>
-
-          {/* Stream Map Visualizer */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            {/* Map Column */}
-            <div className="lg:col-span-8 flex flex-col justify-between border border-indigo-500/10 bg-black/60 p-5 rounded-xl relative">
-              {/* Orchestrator node */}
-              <div className="flex flex-col items-center mb-6">
-                <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-xs font-mono text-indigo-300 font-bold shadow-lg">
-                  <Cpu className="w-4 h-4 text-indigo-400 animate-spin" />
-                  App Client (Genesis Proof Orchestrator)
-                </div>
-                <div className="h-6 w-0.5 bg-gradient-to-b from-indigo-500/30 to-indigo-500/10 border-dashed" />
-              </div>
-
-              {/* Three contracts grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
-                {/* Contract 1 */}
-                <div 
-                  onClick={() => setSelectedContractTab('CONTRACT_1')}
-                  className={`border p-4 rounded-xl text-left cursor-pointer transition-all duration-300 relative ${
-                    selectedContractTab === 'CONTRACT_1' 
-                      ? 'border-indigo-400 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
-                      : 'border-indigo-500/15 bg-black/40 hover:border-indigo-500/40'
-                  } ${lastTriggeredContract === 'CONTRACT_1' ? 'ring-2 ring-emerald-500 animate-pulse' : ''}`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono text-indigo-400 font-bold">CONTRACT 1</span>
-                    <span className={`w-2 h-2 rounded-full ${lastTriggeredContract === 'CONTRACT_1' ? 'bg-emerald-400 animate-ping' : 'bg-indigo-500'}`} />
-                  </div>
-                  <h3 className="text-xs font-serif italic text-indigo-200 mb-1">{t.contract1Name}</h3>
-                  <p className="text-[10px] text-indigo-500/70 leading-relaxed mb-3">
-                    {t.registryDesc}
-                  </p>
-                  <div className="text-[9px] font-mono text-indigo-500 truncate" dir="ltr">
-                    0x7a8eEa...712C2a
-                  </div>
-                </div>
-
-                {/* Contract 2 */}
-                <div 
-                  onClick={() => setSelectedContractTab('CONTRACT_2')}
-                  className={`border p-4 rounded-xl text-left cursor-pointer transition-all duration-300 relative ${
-                    selectedContractTab === 'CONTRACT_2' 
-                      ? 'border-indigo-400 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
-                      : 'border-indigo-500/15 bg-black/40 hover:border-indigo-500/40'
-                  } ${lastTriggeredContract === 'CONTRACT_2' ? 'ring-2 ring-emerald-500 animate-pulse' : ''}`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono text-indigo-400 font-bold">CONTRACT 2</span>
-                    <span className={`w-2 h-2 rounded-full ${lastTriggeredContract === 'CONTRACT_2' ? 'bg-emerald-400 animate-ping' : 'bg-indigo-500'}`} />
-                  </div>
-                  <h3 className="text-xs font-serif italic text-indigo-200 mb-1">{t.contract2Name}</h3>
-                  <p className="text-[10px] text-indigo-500/70 leading-relaxed mb-3">
-                    {t.auditDesc}
-                  </p>
-                  <div className="text-[9px] font-mono text-indigo-500 truncate" dir="ltr">
-                    0x32A5b9...d1E842
-                  </div>
-                </div>
-
-                {/* Contract 3 */}
-                <div 
-                  onClick={() => setSelectedContractTab('CONTRACT_3')}
-                  className={`border p-4 rounded-xl text-left cursor-pointer transition-all duration-300 relative ${
-                    selectedContractTab === 'CONTRACT_3' 
-                      ? 'border-indigo-400 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
-                      : 'border-indigo-500/15 bg-black/40 hover:border-indigo-500/40'
-                  } ${lastTriggeredContract === 'CONTRACT_3' ? 'ring-2 ring-emerald-500 animate-pulse' : ''}`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono text-indigo-400 font-bold">CONTRACT 3</span>
-                    <span className={`w-2 h-2 rounded-full ${lastTriggeredContract === 'CONTRACT_3' ? 'bg-emerald-400 animate-ping' : 'bg-indigo-500'}`} />
-                  </div>
-                  <h3 className="text-xs font-serif italic text-indigo-200 mb-1">{t.contract3Name}</h3>
-                  <p className="text-[10px] text-indigo-500/70 leading-relaxed mb-3">
-                    {t.marketplaceDesc}
-                  </p>
-                  <div className="text-[9px] font-mono text-indigo-500 truncate" dir="ltr">
-                    0x4A7b99...1D31Cd
-                  </div>
-                </div>
+            
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-indigo-500/15 pb-4 mb-5">
+              <div className="text-left">
+                <h2 className="text-sm font-mono uppercase tracking-wider text-indigo-400 font-bold flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-indigo-400" />
+                  {t.contractUpgradeInfo}
+                </h2>
+                <p className="text-xs text-indigo-500/70 mt-1">
+                  {t.modularArchDesc}
+                </p>
               </div>
             </div>
 
-            {/* Contract Interactive Configuration Side Column */}
-            <div className="lg:col-span-4 border border-indigo-500/15 bg-black p-4 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 border-b border-indigo-500/10 pb-2 mb-3">
-                  <Settings className="w-3.5 h-3.5 text-indigo-400" />
-                  <span className="text-xs font-mono text-indigo-300 uppercase font-bold">{t.contractDetails}</span>
+            {/* Stream Map Visualizer */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              {/* Map Column */}
+              <div className="lg:col-span-8 flex flex-col justify-between border border-indigo-500/10 bg-black/60 p-5 rounded-xl relative">
+                {/* Orchestrator node */}
+                <div className="flex flex-col items-center mb-6">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-xs font-mono text-indigo-300 font-bold shadow-lg">
+                    <Cpu className="w-4 h-4 text-indigo-400 animate-spin" />
+                    App Client (Genesis Proof Orchestrator)
+                  </div>
+                  <div className="h-6 w-0.5 bg-gradient-to-b from-indigo-500/30 to-indigo-500/10 border-dashed" />
                 </div>
 
-                {/* Contract Tab View */}
-                {selectedContractTab === 'CONTRACT_1' && (
-                  <div className="space-y-3.5 text-left text-xs">
-                    <h4 className="font-bold text-indigo-200 font-serif italic">{t.contract1Name}</h4>
-                    <p className="text-[11px] text-indigo-500/80 leading-relaxed">
-                      Secures original authorship metadata. It is highly optimized to protect basic mint variables and prevents storage/memory overhead during registration.
+                {/* Three contracts grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
+                  {/* Contract 1 */}
+                  <div 
+                    onClick={() => setSelectedContractTab('CONTRACT_1')}
+                    className={`border p-4 rounded-xl text-left cursor-pointer transition-all duration-300 relative ${
+                      selectedContractTab === 'CONTRACT_1' 
+                        ? 'border-indigo-400 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
+                        : 'border-indigo-500/15 bg-black/40 hover:border-indigo-500/40'
+                    } ${lastTriggeredContract === 'CONTRACT_1' ? 'ring-2 ring-emerald-500 animate-pulse' : ''}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono text-indigo-400 font-bold">CONTRACT 1</span>
+                      <span className={`w-2 h-2 rounded-full ${lastTriggeredContract === 'CONTRACT_1' ? 'bg-emerald-400 animate-ping' : 'bg-indigo-500'}`} />
+                    </div>
+                    <h3 className="text-xs font-serif italic text-indigo-200 mb-1">{t.contract1Name}</h3>
+                    <p className="text-[10px] text-indigo-500/70 leading-relaxed mb-3">
+                      {t.registryDesc}
                     </p>
-                    <div className="bg-indigo-950/15 border border-indigo-500/10 p-3 rounded-sm space-y-2 text-[10px] font-mono text-indigo-400" dir="ltr">
-                      <div><span className="text-indigo-600">Base Mint Fee:</span> 0.05 GETH</div>
-                      <div><span className="text-indigo-600">DB Schema:</span> TokenRegistryV1</div>
-                      <div><span className="text-indigo-600">AI Nodes:</span> 3 Active (Scholar, Legal, Art)</div>
+                    <div className="text-[9px] font-mono text-indigo-500 truncate" dir="ltr">
+                      0x7a8eEa...712C2a
                     </div>
                   </div>
-                )}
 
-                {selectedContractTab === 'CONTRACT_2' && (
-                  <div className="space-y-3.5 text-left text-xs">
-                    <h4 className="font-bold text-indigo-200 font-serif italic">{t.contract2Name}</h4>
-                    <p className="text-[11px] text-indigo-500/80 leading-relaxed">
-                      Calculates the mathematical scoring algorithms. Because this logic is isolated, you can change the formula weight below instantly without touching your NFT registry!
+                  {/* Contract 2 */}
+                  <div 
+                    onClick={() => setSelectedContractTab('CONTRACT_2')}
+                    className={`border p-4 rounded-xl text-left cursor-pointer transition-all duration-300 relative ${
+                      selectedContractTab === 'CONTRACT_2' 
+                        ? 'border-indigo-400 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
+                        : 'border-indigo-500/15 bg-black/40 hover:border-indigo-500/40'
+                    } ${lastTriggeredContract === 'CONTRACT_2' ? 'ring-2 ring-emerald-500 animate-pulse' : ''}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono text-indigo-400 font-bold">CONTRACT 2</span>
+                      <span className={`w-2 h-2 rounded-full ${lastTriggeredContract === 'CONTRACT_2' ? 'bg-emerald-400 animate-ping' : 'bg-indigo-500'}`} />
+                    </div>
+                    <h3 className="text-xs font-serif italic text-indigo-200 mb-1">{t.contract2Name}</h3>
+                    <p className="text-[10px] text-indigo-500/70 leading-relaxed mb-3">
+                      {t.auditDesc}
                     </p>
-                    
-                    {/* Interactive Slider to Tune mathematical trust decay */}
-                    <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-sm space-y-2">
-                      <div className="flex items-center justify-between text-[10px] font-mono text-indigo-400">
-                        <span>{t.decayCoef}</span>
-                        <span className="text-indigo-300 font-bold">{decayWeight * 100}%</span>
-                      </div>
-                      <input 
-                        type="range" 
-                        min="0.1" 
-                        max="0.9" 
-                        step="0.05" 
-                        value={decayWeight} 
-                        onChange={(e) => {
-                          setDecayWeight(Number(e.target.value));
-                          addLogLocal("CONTRACT_UPGRADE", `Contract 2 (Audit) re-calibrated: decay coefficient λ set to ${e.target.value}. Core Registry unaffected.`, "WARNING");
-                        }}
-                        className="w-full accent-indigo-500 cursor-pointer h-1" 
-                      />
-                      <p className="text-[9px] text-indigo-600 leading-normal font-sans italic">
-                        Formula: DecayedScore = (PreviousScore * {Number((1 - decayWeight * 0.43).toFixed(2))}) + (LatestAudit * {Number((decayWeight * 0.43).toFixed(2))})
+                    <div className="text-[9px] font-mono text-indigo-500 truncate" dir="ltr">
+                      0x32A5b9...d1E842
+                    </div>
+                  </div>
+
+                  {/* Contract 3 */}
+                  <div 
+                    onClick={() => setSelectedContractTab('CONTRACT_3')}
+                    className={`border p-4 rounded-xl text-left cursor-pointer transition-all duration-300 relative ${
+                      selectedContractTab === 'CONTRACT_3' 
+                        ? 'border-indigo-400 bg-indigo-500/5 shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
+                        : 'border-indigo-500/15 bg-black/40 hover:border-indigo-500/40'
+                    } ${lastTriggeredContract === 'CONTRACT_3' ? 'ring-2 ring-emerald-500 animate-pulse' : ''}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono text-indigo-400 font-bold">CONTRACT 3</span>
+                      <span className={`w-2 h-2 rounded-full ${lastTriggeredContract === 'CONTRACT_3' ? 'bg-emerald-400 animate-ping' : 'bg-indigo-500'}`} />
+                    </div>
+                    <h3 className="text-xs font-serif italic text-indigo-200 mb-1">{t.contract3Name}</h3>
+                    <p className="text-[10px] text-indigo-500/70 leading-relaxed mb-3">
+                      {t.marketplaceDesc}
+                    </p>
+                    <div className="text-[9px] font-mono text-indigo-500 truncate" dir="ltr">
+                      0x4A7b99...1D31Cd
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contract Interactive Configuration Side Column */}
+              <div className="lg:col-span-4 border border-indigo-500/15 bg-black p-4 rounded-xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 border-b border-indigo-500/10 pb-2 mb-3">
+                    <Settings className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-xs font-mono text-indigo-300 uppercase font-bold">{t.contractDetails}</span>
+                  </div>
+
+                  {/* Contract Tab View */}
+                  {selectedContractTab === 'CONTRACT_1' && (
+                    <div className="space-y-3.5 text-left text-xs">
+                      <h4 className="font-bold text-indigo-200 font-serif italic">{t.contract1Name}</h4>
+                      <p className="text-[11px] text-indigo-500/80 leading-relaxed">
+                        Secures original authorship metadata. It is highly optimized to protect basic mint variables and prevents storage/memory overhead during registration.
                       </p>
-                    </div>
-                  </div>
-                )}
-
-                {selectedContractTab === 'CONTRACT_3' && (
-                  <div className="space-y-3.5 text-left text-xs">
-                    <h4 className="font-bold text-indigo-200 font-serif italic">{t.contract3Name}</h4>
-                    <p className="text-[11px] text-indigo-500/80 leading-relaxed">
-                      Processes listings, purchases, and manages royalty transfers. High financial processing volumes are completely sandboxed here, saving protocol resources.
-                    </p>
-                    
-                    {/* Platform Fee Configurator */}
-                    <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-sm space-y-2">
-                      <div className="flex items-center justify-between text-[10px] font-mono text-indigo-400">
-                        <span>{t.protocolFee}</span>
-                        <span className="text-emerald-400 font-bold">{platformFee}%</span>
+                      <div className="bg-indigo-950/15 border border-indigo-500/10 p-3 rounded-sm space-y-2 text-[10px] font-mono text-indigo-400" dir="ltr">
+                        <div><span className="text-indigo-600">Base Mint Fee:</span> 0.05 GETH</div>
+                        <div><span className="text-indigo-600">DB Schema:</span> TokenRegistryV1</div>
+                        <div><span className="text-indigo-600">AI Nodes:</span> 3 Active (Scholar, Legal, Art)</div>
                       </div>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="5" 
-                        step="0.5" 
-                        value={platformFee} 
-                        onChange={(e) => {
-                          setPlatformFee(Number(e.target.value));
-                          addLogLocal("MARKET_UPGRADE", `Contract 3 (Marketplace) parameters tuned: protocol trade fee set to ${e.target.value}%.`, "INFO");
-                        }}
-                        className="w-full accent-indigo-500 cursor-pointer h-1" 
-                      />
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
 
-              {/* Status footer */}
-              <div className="mt-4 pt-3 border-t border-indigo-500/10 flex items-center justify-between text-[10px] font-mono text-indigo-500">
-                <span>{t.synced}</span>
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t.live}</span>
+                  {selectedContractTab === 'CONTRACT_2' && (
+                    <div className="space-y-3.5 text-left text-xs">
+                      <h4 className="font-bold text-indigo-200 font-serif italic">{t.contract2Name}</h4>
+                      <p className="text-[11px] text-indigo-500/80 leading-relaxed">
+                        Calculates the mathematical scoring algorithms. Because this logic is isolated, you can change the formula weight below instantly without touching your NFT registry!
+                      </p>
+                      
+                      {/* Interactive Slider to Tune mathematical trust decay */}
+                      <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-sm space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-indigo-400">
+                          <span>{t.decayCoef}</span>
+                          <span className="text-indigo-300 font-bold">{decayWeight * 100}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0.1" 
+                          max="0.9" 
+                          step="0.05" 
+                          value={decayWeight} 
+                          onChange={(e) => {
+                            setDecayWeight(Number(e.target.value));
+                            addLogLocal("CONTRACT_UPGRADE", `Contract 2 (Audit) re-calibrated: decay coefficient λ set to ${e.target.value}. Core Registry unaffected.`, "WARNING");
+                          }}
+                          className="w-full accent-indigo-500 cursor-pointer h-1" 
+                        />
+                        <p className="text-[9px] text-indigo-600 leading-normal font-sans italic">
+                          Formula: DecayedScore = (PreviousScore * {Number((1 - decayWeight * 0.43).toFixed(2))}) + (LatestAudit * {Number((decayWeight * 0.43).toFixed(2))})
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedContractTab === 'CONTRACT_3' && (
+                    <div className="space-y-3.5 text-left text-xs">
+                      <h4 className="font-bold text-indigo-200 font-serif italic">{t.contract3Name}</h4>
+                      <p className="text-[11px] text-indigo-500/80 leading-relaxed">
+                        Processes listings, purchases, and manages royalty transfers. High financial processing volumes are completely sandboxed here, saving protocol resources.
+                      </p>
+                      
+                      {/* Platform Fee Configurator */}
+                      <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-sm space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-indigo-400">
+                          <span>{t.protocolFee}</span>
+                          <span className="text-emerald-400 font-bold">{platformFee}%</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="5" 
+                          step="0.5" 
+                          value={platformFee} 
+                          onChange={(e) => {
+                            setPlatformFee(Number(e.target.value));
+                            addLogLocal("MARKET_UPGRADE", `Contract 3 (Marketplace) parameters tuned: protocol trade fee set to ${e.target.value}%.`, "INFO");
+                          }}
+                          className="w-full accent-indigo-500 cursor-pointer h-1" 
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Status footer */}
+                <div className="mt-4 pt-3 border-t border-indigo-500/10 flex items-center justify-between text-[10px] font-mono text-indigo-500">
+                  <span>{t.synced}</span>
+                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t.live}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Main Sandbox Layout */}
       <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1020,31 +1051,33 @@ export default function App() {
         <div className="lg:col-span-4 space-y-6">
           
           {/* Protocol Info Board */}
-          <div className="bg-black border border-indigo-500/20 rounded-xl p-5 text-left space-y-4 shadow-xl">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-indigo-400 font-bold border-b border-indigo-500/10 pb-2.5 flex items-center gap-2">
-              <Network className="w-4 h-4 text-indigo-500" />
-              {t.layeredScience}
-            </h3>
-            
-            <p className="text-[11px] text-indigo-500/80 leading-relaxed italic text-left">
-              {t.layeredScienceDesc}
-            </p>
+          {viewRole === 'admin' && (
+            <div className="bg-black border border-indigo-500/20 rounded-xl p-5 text-left space-y-4 shadow-xl">
+              <h3 className="text-sm font-mono uppercase tracking-wider text-indigo-400 font-bold border-b border-indigo-500/10 pb-2.5 flex items-center gap-2">
+                <Network className="w-4 h-4 text-indigo-500" />
+                {t.layeredScience}
+              </h3>
+              
+              <p className="text-[11px] text-indigo-500/80 leading-relaxed italic text-left">
+                {t.layeredScienceDesc}
+              </p>
 
-            <div className="space-y-2 text-[11px] font-sans text-left">
-              <div className="p-3 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-sm">
-                <strong className="text-indigo-400 block text-[10px] mb-1">🛡️ {t.contract1Name}</strong>
-                <span className="text-[10px] text-indigo-500/70">{t.contract1Desc}</span>
-              </div>
-              <div className="p-3 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-sm">
-                <strong className="text-indigo-400 block text-[10px] mb-1">⚖️ {t.contract2Name}</strong>
-                <span className="text-[10px] text-indigo-500/70">{t.contract2Desc}</span>
-              </div>
-              <div className="p-3 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-sm">
-                <strong className="text-indigo-400 block text-[10px] mb-1">💰 {t.contract3Name}</strong>
-                <span className="text-[10px] text-indigo-500/70">{t.contract3Desc}</span>
+              <div className="space-y-2 text-[11px] font-sans text-left">
+                <div className="p-3 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-sm">
+                  <strong className="text-indigo-400 block text-[10px] mb-1">🛡️ {t.contract1Name}</strong>
+                  <span className="text-[10px] text-indigo-500/70">{t.contract1Desc}</span>
+                </div>
+                <div className="p-3 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-sm">
+                  <strong className="text-indigo-400 block text-[10px] mb-1">⚖️ {t.contract2Name}</strong>
+                  <span className="text-[10px] text-indigo-500/70">{t.contract2Desc}</span>
+                </div>
+                <div className="p-3 bg-indigo-500/[0.03] border border-indigo-500/10 rounded-sm">
+                  <strong className="text-indigo-400 block text-[10px] mb-1">💰 {t.contract3Name}</strong>
+                  <span className="text-[10px] text-indigo-500/70">{t.contract3Desc}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Live GenLayer Virtual Machine (GLVM) Execution Logs Terminal */}
           <div className="bg-black border border-indigo-500/20 rounded-xl p-4 text-left font-mono text-[10px] space-y-3.5 shadow-2xl relative overflow-hidden">
